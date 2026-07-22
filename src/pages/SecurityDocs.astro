@@ -1,0 +1,12 @@
+---
+import Base from '@/layouts/Base.astro';
+import Page from '@/components/pages_SecurityDocs.jsx';
+---
+
+<Base
+  title={`Security | AssetStack`}
+  description={`AssetStack security documentation — data handling, access control and infrastructure security posture.`}
+  path="/SecurityDocs"
+>
+  <Page client:load />
+</Base>

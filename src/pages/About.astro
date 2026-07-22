@@ -1,0 +1,12 @@
+---
+import Base from '@/layouts/Base.astro';
+import Page from '@/components/pages_About.jsx';
+---
+
+<Base
+  title={`About | AssetStack`}
+  description={`The team and mission behind AssetStack — building the AI operating system for physical assets.`}
+  path="/About"
+>
+  <Page client:load />
+</Base>

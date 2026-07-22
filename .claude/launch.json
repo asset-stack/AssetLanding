@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "marketing-preview",
+      "runtimeExecutable": "/private/tmp/claude-501/-Users-a/78355cb2-f152-4623-822c-68eb90e934e4/scratchpad/node-v22.20.0-darwin-arm64/bin/npx",
+      "runtimeArgs": ["astro", "preview", "--port", "4321"],
+      "port": 4321
+    }
+  ]
+}
