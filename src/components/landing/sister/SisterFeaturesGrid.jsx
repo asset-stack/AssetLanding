@@ -1,5 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Defers fetching the (large) demo video until the player is actually near
+// the viewport — a plain <video autoPlay> starts downloading on page load
+// even when the section is far below the fold.
+function LazyVideo({ src }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="w-full h-full">
+      {visible && (
+        <video src={src} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+      )}
+    </div>
+  );
+}
 import { Box, Eye, Wifi, ClipboardCheck, BarChart3, Brain } from 'lucide-react';
 
 import AssetTreePreview from '@/components/landing/industries/previews/AssetTreePreview';
@@ -128,14 +160,7 @@ export default function SisterFeaturesGrid() {
                 className="w-full h-full relative"
               >
                 {active.videoUrl ? (
-                  <video 
-                    src={active.videoUrl} 
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline 
-                    className="w-full h-full object-cover" 
-                  />
+                  <LazyVideo src={active.videoUrl} />
                 ) : active.preview ? (
                   <active.preview />
                 ) : null}

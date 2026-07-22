@@ -13,6 +13,34 @@ const {
 
 const canonical = new URL(path, Astro.site).href;
 const ogImage = new URL('/og-image.png', Astro.site).href;
+
+// Organization + product schema for Google (knowledge panel, logo in
+// results). Only facts that appear on the site itself — nothing invented.
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://assetstackai.com/#organization',
+      name: 'AssetStack',
+      url: 'https://assetstackai.com/',
+      logo: ogImage,
+      description:
+        'AI asset management for councils, rail and industrial operators. Reads photos, sensors and maintenance history to predict failures and prove savings in an auditable ledger.',
+      email: 'hello@assetstackai.com',
+      telephone: '+61 439 032 387',
+      areaServed: 'AU',
+    },
+    {
+      '@type': 'SoftwareApplication',
+      name: 'AssetStack',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      url: 'https://assetstackai.com/',
+      publisher: { '@id': 'https://assetstackai.com/#organization' },
+    },
+  ],
+};
 ---
 
 <html lang="en-AU">
@@ -39,6 +67,8 @@ const ogImage = new URL('/og-image.png', Astro.site).href;
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>
   <body>
     <slot />

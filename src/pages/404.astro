@@ -1,0 +1,27 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+
+<Base
+  title="Page not found | AssetStack"
+  description="The page you're looking for doesn't exist."
+  path="/404"
+>
+  <div class="min-h-screen bg-white text-slate-900 antialiased flex items-center justify-center px-6">
+    <div class="max-w-md text-center">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">404</p>
+      <h1 class="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.03em] text-slate-900">
+        Page not <span class="font-serif italic font-medium text-primary">found.</span>
+      </h1>
+      <p class="mt-4 text-[15px] text-slate-600 leading-relaxed">
+        The page you're after doesn't exist or has moved.
+        Looking for the platform? It lives at
+        <a href="https://bunburycouncil.assetstack.site/" class="text-primary hover:underline">bunburycouncil.assetstack.site</a>.
+      </p>
+      <div class="mt-8 flex items-center justify-center gap-3">
+        <a href="/" class="rounded-lg bg-[#1925aa] px-5 py-2.5 text-[13px] font-semibold text-white hover:opacity-90">Back to home</a>
+        <a href="/Contact" class="rounded-lg border border-slate-300 px-5 py-2.5 text-[13px] font-semibold text-slate-700 hover:bg-slate-50">Contact us</a>
+      </div>
+    </div>
+  </div>
+</Base>

@@ -9,6 +9,10 @@ import { fileURLToPath } from 'node:url';
 export default defineConfig({
   site: 'https://assetstackai.com',
   output: 'static',
+  // Emit /Product.html instead of /Product/index.html so served URLs match
+  // the canonicals and sitemap exactly (no trailing-slash mismatch).
+  build: { format: 'file' },
+  trailingSlash: 'never',
   // Old Base44 route aliases — keep inbound links working.
   redirects: {
     '/Landing': '/',
