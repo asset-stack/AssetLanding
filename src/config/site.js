@@ -10,7 +10,7 @@ export const PLATFORM_URL = 'https://bunburycouncil.assetstack.site/';
 // create a form at https://formspree.io and paste its URL here, like
 // 'https://formspree.io/f/abcdwxyz'). While it is empty the form falls back
 // to opening the visitor's mail client with every field included.
-export const FORM_ENDPOINT = '';
+export const FORM_ENDPOINT = 'https://formspree.io/f/maqrbzgd';
 export const CONTACT_EMAILS = ['david@assetstackai.com', 'josh@assetstackai.com'];
 
 // Landing page section order. Previously fetched from the Base44
