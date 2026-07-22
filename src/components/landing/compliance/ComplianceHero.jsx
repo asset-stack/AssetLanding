@@ -5,7 +5,7 @@ import { ArrowRight, Play } from 'lucide-react';
 import HeroDitherCanvas from '@/components/landing/HeroDitherCanvas';
 
 const HERO_IMG =
-  '/media/21e58ce44_abstract-ceiling-of-the-daxing-airport-2026-01-07-07-14-49-utc.jpg';
+  '/media/21e58ce44_abstract-ceiling-of-the-daxing-airport-2026-01-07-07-14-49-utc.webp';
 
 export default function ComplianceHero() {
   const titleRef = useRef(null);

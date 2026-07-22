@@ -5,7 +5,7 @@ import { ArrowRight, Play } from 'lucide-react';
 import HeroDitherCanvas from '@/components/landing/HeroDitherCanvas';
 
 const HERO_IMG =
-  '/media/4f0578003_goodwill-bridge-in-brisbane-australia-2026-03-19-22-08-30-utc.jpg';
+  '/media/4f0578003_goodwill-bridge-in-brisbane-australia-2026-03-19-22-08-30-utc.webp';
 
 export default function IndustriesHero() {
   const titleRef = useRef(null);

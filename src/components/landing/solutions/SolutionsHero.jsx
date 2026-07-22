@@ -5,7 +5,7 @@ import { ArrowRight, Play } from 'lucide-react';
 import HeroDitherCanvas from '@/components/landing/HeroDitherCanvas';
 
 const HERO_IMG =
-  '/media/75486db29_perth-australia-2026-03-24-14-06-21-utc.jpg';
+  '/media/75486db29_perth-australia-2026-03-24-14-06-21-utc.webp';
 
 export default function SolutionsHero() {
   const titleRef = useRef(null);

@@ -28,7 +28,7 @@ export default function SisterFeaturesGrid() {
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none bg-no-repeat bg-center"
         style={{
-          backgroundImage: 'url(/media/68f92e2fb_Screenshot2026-05-25at124049PM.png)',
+          backgroundImage: 'url(/media/68f92e2fb_Screenshot2026-05-25at124049PM.webp)',
           backgroundSize: '100% 100%',
         }}
       />

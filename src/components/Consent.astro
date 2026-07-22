@@ -1,0 +1,79 @@
+---
+// Consent-gated analytics. Nothing loads until the visitor accepts:
+// no GTM, no GA, no Apollo — matching AU Privacy Act / GDPR expectations.
+// Choice is stored in localStorage ('as-consent' = 'granted' | 'denied').
+// IDs match the previous Base44 site exactly.
+---
+
+<div
+  id="consent-banner"
+  hidden
+  class="fixed bottom-4 left-4 right-4 md:left-auto md:max-w-sm z-[100] rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl"
+>
+  <p class="text-[13px] leading-relaxed text-slate-700">
+    We use analytics cookies to understand how visitors use this site.
+    We only set them if you agree.
+  </p>
+  <div class="mt-4 flex gap-2">
+    <button
+      id="consent-accept"
+      class="flex-1 rounded-lg bg-[#1925aa] px-4 py-2 text-[13px] font-semibold text-white hover:opacity-90"
+    >Accept</button>
+    <button
+      id="consent-decline"
+      class="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-[13px] font-semibold text-slate-700 hover:bg-slate-50"
+    >Decline</button>
+  </div>
+</div>
+
+<script>
+  const KEY = 'as-consent';
+
+  function loadAnalytics() {
+    // Google Tag Manager
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    const gtm = document.createElement('script');
+    gtm.async = true;
+    gtm.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-MSPX2MKL';
+    document.head.appendChild(gtm);
+
+    // GA4
+    const ga = document.createElement('script');
+    ga.async = true;
+    ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-Z014QD4K1B';
+    document.head.appendChild(ga);
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    window.gtag('config', 'G-Z014QD4K1B');
+
+    // Apollo.io website tracker
+    const apollo = document.createElement('script');
+    apollo.src = 'https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache=' +
+      Math.random().toString(36).substring(7);
+    apollo.async = true;
+    apollo.defer = true;
+    apollo.onload = function () {
+      window.trackingFunctions?.onLoad({ appId: '6a331854b0382c000c776cac' });
+    };
+    document.head.appendChild(apollo);
+  }
+
+  const banner = document.getElementById('consent-banner');
+  const stored = localStorage.getItem(KEY);
+
+  if (stored === 'granted') {
+    loadAnalytics();
+  } else if (stored !== 'denied') {
+    banner.hidden = false;
+    document.getElementById('consent-accept').addEventListener('click', () => {
+      localStorage.setItem(KEY, 'granted');
+      banner.hidden = true;
+      loadAnalytics();
+    });
+    document.getElementById('consent-decline').addEventListener('click', () => {
+      localStorage.setItem(KEY, 'denied');
+      banner.hidden = true;
+    });
+  }
+</script>

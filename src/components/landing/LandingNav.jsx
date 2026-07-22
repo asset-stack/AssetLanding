@@ -51,7 +51,7 @@ export default function LandingNav() {
             <BrandLogo size={32} />
           ) : (
             <img
-              src="/media/c1034c5ca_AssetStack_Logo_Whitecopy.png"
+              src="/media/c1034c5ca_AssetStack_Logo_Whitecopy.webp"
               alt="AssetStack"
               className="block h-7 w-auto"
             />

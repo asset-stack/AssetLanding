@@ -7,7 +7,7 @@ export default function MechanismBackground() {
   return (
     <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
       <img
-        src="/media/de94d1985_Screenshot2026-05-25at124049PM.png"
+        src="/media/de94d1985_Screenshot2026-05-25at124049PM.webp"
         alt=""
         className="absolute inset-0 w-full h-full object-cover brightness-[0.55] saturate-150"
         aria-hidden="true"

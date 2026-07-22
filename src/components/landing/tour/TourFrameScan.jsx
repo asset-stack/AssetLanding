@@ -27,7 +27,7 @@ export default function TourFrameScan() {
         {/* Image with bboxes */}
         <div className="relative bg-slate-100 overflow-hidden min-h-[300px]">
           <img
-            src="/media/4e24d416b_old-rusty-steel-rope-of-bridge-closeup-2026-01-11-08-36-08-utc.jpg"
+            src="/media/4e24d416b_old-rusty-steel-rope-of-bridge-closeup-2026-01-11-08-36-08-utc.webp"
             alt="Field Scan"
             className="absolute inset-0 w-full h-full object-cover"
           />

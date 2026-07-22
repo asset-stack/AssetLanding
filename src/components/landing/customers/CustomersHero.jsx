@@ -5,7 +5,7 @@ import { ArrowRight, Play } from 'lucide-react';
 import HeroDitherCanvas from '@/components/landing/HeroDitherCanvas';
 
 const HERO_IMG =
-  '/media/2dbd8e929_modern-house-in-minimal-style-with-light-and-shado-2026-03-24-06-17-21-utc.jpg';
+  '/media/2dbd8e929_modern-house-in-minimal-style-with-light-and-shado-2026-03-24-06-17-21-utc.webp';
 
 export default function CustomersHero() {
   const titleRef = useRef(null);

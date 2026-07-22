@@ -4,17 +4,56 @@ import { Mail, Send, Check, Building2, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { FORM_ENDPOINT, CONTACT_EMAILS } from '@/config/site';
 
 export default function ContactSection() {
   const [form, setForm] = useState({ name: '', email: '', org: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
 
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
     if (!form.email) return;
-    setSubmitted(true);
+    setError('');
+
+    // No form backend configured — open the visitor's mail client with the
+    // full submission instead. Don't claim success; the email isn't sent
+    // until they hit send themselves.
+    if (!FORM_ENDPOINT) {
+      const body = [
+        `Name: ${form.name}`,
+        `Email: ${form.email}`,
+        `Organisation: ${form.org}`,
+        '',
+        form.message,
+      ].join('\n');
+      window.location.href =
+        `mailto:${CONTACT_EMAILS.join(',')}?subject=${encodeURIComponent('Demo Request')}&body=${encodeURIComponent(body)}`;
+      return;
+    }
+
+    setSending(true);
+    try {
+      const res = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          organisation: form.org,
+          message: form.message,
+        }),
+      });
+      if (!res.ok) throw new Error(`Form endpoint returned ${res.status}`);
+      setSubmitted(true);
+    } catch {
+      setError(`Something went wrong sending your request — please email us directly at ${CONTACT_EMAILS[0]}.`);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -92,9 +131,12 @@ export default function ContactSection() {
                     placeholder="Asset count, sectors, current pain points…"
                   />
                 </div>
-                <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary/90 text-white text-[13px] font-semibold elevation-1" onClick={() => { window.location.href = `mailto:david@assetstackai.com,josh@assetstackai.com?subject=Demo Request&body=Name: ${form.name}%0AOrg: ${form.org}%0A%0A${form.message}`; }}>
-                  Request a demo <Send className="w-3.5 h-3.5 ml-1.5" />
+                <Button type="submit" size="lg" disabled={sending} className="w-full bg-primary hover:bg-primary/90 text-white text-[13px] font-semibold elevation-1">
+                  {sending ? 'Sending…' : <>Request a demo <Send className="w-3.5 h-3.5 ml-1.5" /></>}
                 </Button>
+                {error && (
+                  <p className="text-[12px] text-rose-600 text-center" role="alert">{error}</p>
+                )}
                 <p className="text-[10px] text-slate-400 text-center">
                   We'll only use your details to contact you about AssetStack.
                 </p>

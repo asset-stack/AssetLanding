@@ -44,16 +44,17 @@ npm run preview   # serve dist/ locally
 
 ## Known issues / next steps
 
-1. **Contact form is mailto-only** (`ContactSection.jsx` — opens the visitor's
-   mail client addressed to david@/josh@assetstackai.com; email + phone fields
-   are not included in the mailto body). Wire it to a real endpoint
-   (Formspree / Netlify Forms / CRM) before relying on it for leads.
-2. **Analytics/consent not yet added.** The old GTM (GTM-MSPX2MKL), GA
-   (G-Z014QD4K1B) and Apollo trackers were deliberately NOT carried over —
-   add them behind a consent banner.
-3. **Image optimisation.** `public/media/` holds originals (two 743 KB PNGs,
-   one 1.7 MB PNG, 40 MB mp4). Convert images to WebP/AVIF and consider
-   streaming the video from a CDN.
+1. **Contact form needs a backend URL.** The form POSTs JSON to
+   `FORM_ENDPOINT` in `src/config/site.js`. Create a form at
+   https://formspree.io (or any endpoint that accepts JSON POSTs) and paste
+   its URL there. Until then it falls back to opening the visitor's mail
+   client with all fields included — functional but not trackable, and it
+   never shows a false success state.
+2. **Analytics are consent-gated** (`src/components/Consent.astro`). GTM
+   (GTM-MSPX2MKL), GA4 (G-Z014QD4K1B) and Apollo (appId 6a331854…) load only
+   after the visitor clicks Accept; the choice persists in localStorage.
+3. **Video hosting.** Images are WebP (max 1920px, q82). The remaining weight
+   is `13454d771_DigitalTwin.mp4` (40 MB) — consider Cloudflare Stream / Mux.
 4. **Deploy**: any static host (Cloudflare Pages / Vercel / Netlify),
    build command `npm run build`, output `dist/`. Before DNS cutover, confirm
    no one reaches the platform via assetstackai.com app routes (they will 404

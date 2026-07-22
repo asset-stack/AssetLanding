@@ -5,7 +5,7 @@ import { ArrowRight, Play } from 'lucide-react';
 import HeroDitherCanvas from '@/components/landing/HeroDitherCanvas';
 
 const HERO_IMG =
-  '/media/a78c9f331_yerevan-cascade-complex-in-armenia-black-and-whit-2026-03-17-04-06-22-utc.jpg';
+  '/media/a78c9f331_yerevan-cascade-complex-in-armenia-black-and-whit-2026-03-17-04-06-22-utc.webp';
 
 export default function AboutHero() {
   const titleRef = useRef(null);

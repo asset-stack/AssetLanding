@@ -1,8 +1,8 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 
-const IMG1 = '/media/78b1f1b84_1.png';
-const IMG2 = '/media/c85a8fdda_2.png';
+const IMG1 = '/media/78b1f1b84_1.webp';
+const IMG2 = '/media/c85a8fdda_2.webp';
 const RADIUS = 240;
 
 function HeroBanner({ pos }) {

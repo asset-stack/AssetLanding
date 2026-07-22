@@ -11,7 +11,7 @@ export default function BrandLogo({ size = 32, showWordmark = true, tone = 'dark
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <img
-        src="/media/5ff4ca1d8_8b7d4979d_AssetStack_Logo_Icon.png"
+        src="/media/5ff4ca1d8_8b7d4979d_AssetStack_Logo_Icon.webp"
         alt="AssetStack"
         width={size}
         height={size}

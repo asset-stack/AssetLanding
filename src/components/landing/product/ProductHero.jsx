@@ -5,7 +5,7 @@ import { ArrowRight, Play } from 'lucide-react';
 import HeroDitherCanvas from '@/components/landing/HeroDitherCanvas';
 
 const HERO_IMG =
-  '/media/7155f054d_australia-melbourne-seafarers-bridge-2026-03-26-11-27-12-utc.jpg';
+  '/media/7155f054d_australia-melbourne-seafarers-bridge-2026-03-26-11-27-12-utc.webp';
 
 export default function ProductHero() {
   const titleRef = useRef(null);

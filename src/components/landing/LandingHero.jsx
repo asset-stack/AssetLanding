@@ -5,7 +5,7 @@ import { ArrowRight, Play } from 'lucide-react';
 import HeroDitherCanvas from './HeroDitherCanvas';
 
 const HERO_IMG =
-'/media/b37f3860d_architectural-elegance-of-the-sails-at-the-sydney-2026-01-09-11-39-37-utc.jpg';
+'/media/b37f3860d_architectural-elegance-of-the-sails-at-the-sydney-2026-01-09-11-39-37-utc.webp';
 
 export default function LandingHero() {
   const titleRef = useRef(null);

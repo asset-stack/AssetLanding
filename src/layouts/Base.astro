@@ -3,6 +3,7 @@
 // All SEO metadata is emitted here, server-side, in the static HTML —
 // nothing is set client-side.
 import '@/styles/index.css';
+import Consent from '@/components/Consent.astro';
 
 const {
   title,
@@ -41,5 +42,6 @@ const ogImage = new URL('/og-image.png', Astro.site).href;
   </head>
   <body>
     <slot />
+    <Consent />
   </body>
 </html>

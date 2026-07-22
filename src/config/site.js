@@ -5,6 +5,14 @@
 // Where "Sign in" goes. Plain link — no auth SDK on the marketing site.
 export const PLATFORM_URL = 'https://bunburycouncil.assetstack.site/';
 
+// Contact form delivery.
+// FORM_ENDPOINT: a form backend that accepts a JSON POST (e.g. Formspree:
+// create a form at https://formspree.io and paste its URL here, like
+// 'https://formspree.io/f/abcdwxyz'). While it is empty the form falls back
+// to opening the visitor's mail client with every field included.
+export const FORM_ENDPOINT = '';
+export const CONTACT_EMAILS = ['david@assetstackai.com', 'josh@assetstackai.com'];
+
 // Landing page section order. Previously fetched from the Base44
 // `LandingLayout` entity at runtime; this is the exact active layout from
 // production (captured 2026-07-22) with hidden sections omitted
