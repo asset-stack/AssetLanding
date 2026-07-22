@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { Link as RouterLink } from 'react-router-dom';
-import { PLATFORM_URL } from '@/config/site';
 import BrandLogo from './BrandLogo';
 
 export default function LandingNav() {
@@ -32,10 +31,6 @@ export default function LandingNav() {
     { href: '/LandingCompliance', label: 'Compliance', isRoute: true },
     { href: '/Contact', label: 'Contact', isRoute: true },
   ];
-
-  const handleSignIn = () => {
-    window.location.href = PLATFORM_URL;
-  };
 
   return (
     <motion.nav
@@ -89,18 +84,6 @@ export default function LandingNav() {
         </div>
 
         <div className="hidden lg:flex items-center gap-1.5">
-          <Button
-            onClick={handleSignIn}
-            variant="outline"
-            size="sm"
-            className={`text-[13px] font-semibold ${
-              pastHero
-                ? 'text-slate-800 border-slate-300 hover:bg-slate-50'
-                : 'text-white border-white/50 bg-transparent hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            Sign in
-          </Button>
           <a href="#contact">
             <Button
               size="sm"
@@ -136,9 +119,6 @@ export default function LandingNav() {
               </a>
             )
           )}
-          <Button onClick={handleSignIn} variant="outline" className="w-full mt-2">
-            Sign in
-          </Button>
           <a href="#contact" className="block" onClick={() => setMobileOpen(false)}>
             <Button className="w-full mt-2 bg-primary hover:bg-primary/90 text-white">Book a demo</Button>
           </a>
