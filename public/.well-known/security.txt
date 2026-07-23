@@ -1,0 +1,5 @@
+# https://securitytxt.org/  (RFC 9116)
+Contact: mailto:hello@assetstackai.com
+Expires: 2027-07-23T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://assetstackai.com/.well-known/security.txt
