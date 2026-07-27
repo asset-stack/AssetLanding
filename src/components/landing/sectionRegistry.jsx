@@ -45,7 +45,7 @@ const SisterFeaturesGrid = lazyWithRetry(() => import('@/components/landing/sist
 export const SECTION_REGISTRY = {
   hero:                 { label: 'Hero',                    description: 'Top hero with live AssetMind widget',   component: LandingHero,           lazy: false, fallbackHeight: 0 },
   assetMind:            { label: 'AssetMind Demo',          description: 'Interactive AssetMind chat and Command Center', component: AssetMindSection,      lazy: false, fallbackHeight: 600 },
-  logoCloud:            { label: 'Logo Wall',               description: 'Customer / partner logos',              component: LogoCloud,             lazy: true,  fallbackHeight: 120 },
+  logoCloud:            { label: 'Logo Wall',               description: 'Customer / partner logos',              component: LogoCloud,             lazy: true,  fallbackHeight: 420 },
   personaSwitcher:      { label: 'Persona Switcher',        description: 'Tailors the rest of the page',          component: PersonaSwitcher,       lazy: true,  fallbackHeight: 520 },
   mechanism:            { label: 'How It Works (Mechanism)',description: 'How AssetStack actually works',         component: MechanismSection,      lazy: true,  fallbackHeight: 640 },
   whatsNew:             { label: "What's New",              description: 'Latest features showcase',              component: WhatsNewShowcase,      lazy: true,  fallbackHeight: 720 },
