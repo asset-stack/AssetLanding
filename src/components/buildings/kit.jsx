@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 
 // ─── Sample portfolio ──────────────────────────────────────────────────────
 // Illustrative data only — every panel on /Buildings renders from this, so
@@ -7,29 +8,34 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 export const COND = {
   1: { label: 'Excellent', color: 'var(--bx-c1)' },
   2: { label: 'Good', color: 'var(--bx-c2)' },
-  3: { label: 'Fair', color: 'var(--bx-c3)' },
+  3: { label: 'Average', color: 'var(--bx-c3)' },
   4: { label: 'Poor', color: 'var(--bx-c4)' },
-  5: { label: 'Failed', color: 'var(--bx-c5)' },
+  5: { label: 'Very poor', color: 'var(--bx-c5)' },
 };
 
 export const BUILDINGS = [
-  { id: 'AQU-03', name: 'Aquatic Centre', type: 'Recreation', cond: 4, risk: 86, x: 612, y: 248, gfa: '6,420 m²' },
-  { id: 'HAL-05', name: 'Eastside Community Hall', type: 'Community', cond: 4, risk: 72, x: 668, y: 128, gfa: '940 m²' },
-  { id: 'DEP-04', name: 'Works Depot', type: 'Operational', cond: 3, risk: 61, x: 182, y: 368, gfa: '3,100 m²' },
-  { id: 'CIV-01', name: 'Civic Centre', type: 'Administration', cond: 3, risk: 58, x: 404, y: 214, gfa: '8,860 m²' },
-  { id: 'REC-08', name: 'Leisure Centre', type: 'Recreation', cond: 3, risk: 49, x: 286, y: 118, gfa: '4,210 m²' },
-  { id: 'LIB-02', name: 'Central Library', type: 'Cultural', cond: 2, risk: 34, x: 452, y: 318, gfa: '3,740 m²' },
-  { id: 'CCC-06', name: 'Childcare Centre', type: 'Community', cond: 2, risk: 28, x: 532, y: 408, gfa: '760 m²' },
-  { id: 'GAL-07', name: 'Regional Gallery', type: 'Cultural', cond: 1, risk: 12, x: 352, y: 412, gfa: '2,050 m²' },
+  { id: 'AQU-03', name: 'Aquatic Centre', type: 'Recreation', cond: 4, risk: 86, x: 380, y: 236, gfa: '6,420 m²' },
+  { id: 'HAL-05', name: 'Community Hall', type: 'Community', cond: 4, risk: 72, x: 470, y: 150, gfa: '940 m²' },
+  { id: 'DEP-04', name: 'Works Depot', type: 'Operational', cond: 3, risk: 61, x: 560, y: 330, gfa: '3,100 m²' },
+  { id: 'CIV-01', name: 'Council Chambers', type: 'Administration', cond: 3, risk: 58, x: 312, y: 170, gfa: '8,860 m²' },
+  { id: 'REC-08', name: 'Sports Complex', type: 'Recreation', cond: 3, risk: 49, x: 640, y: 210, gfa: '4,210 m²' },
+  { id: 'LIB-02', name: 'Library & Gallery', type: 'Cultural', cond: 2, risk: 34, x: 250, y: 300, gfa: '3,740 m²' },
+  { id: 'CCC-06', name: 'Childcare Centre', type: 'Community', cond: 2, risk: 28, x: 470, y: 400, gfa: '760 m²' },
+  { id: 'AIR-07', name: 'Airport Terminal', type: 'Transport', cond: 1, risk: 12, x: 700, y: 400, gfa: '2,050 m²' },
 ];
 
+// Mirrors the AssetStack demo workspace (Dashboard + Asset Register views).
 export const PORTFOLIO = {
   name: 'Sample council portfolio',
-  buildings: 48,
-  components: '6,212',
-  avgCond: '2.9',
-  critical: 14,
-  fwp: '$86.4M',
+  buildings: 12,
+  components: '4,108',
+  rooms: 241,
+  avgCond: '2.7',
+  critical: 143,
+  health: '57%',
+  peakYear: 2052,
+  remLife: '12.2',
+  fwp: '$2.70M',
 };
 
 export const fmtM = (v) => `$${(v / 1e6).toFixed(v >= 1e7 ? 1 : 2)}M`;
@@ -70,7 +76,21 @@ export function CondDot({ c, pulse = false, size = 6 }) {
 export function CondBadge({ c }) {
   return (
     <span className="inline-flex items-center gap-1.5 mono text-[11px]" style={{ color: COND[c].color }}>
-      <CondDot c={c} /> C{c}
+      <CondDot c={c} /> {c} · {COND[c].label}
+    </span>
+  );
+}
+
+// VEXTO number styling: integer part bright, decimals/suffix dimmed.
+export function Num({ v, className = '' }) {
+  const str = String(v);
+  const m = str.match(/^([^.\d]*[\d,]+)(\.\d+)?(.*)$/);
+  if (!m) return <span className={className}>{str}</span>;
+  return (
+    <span className={className}>
+      {m[1]}
+      {m[2] && <span className="text-white/40">{m[2]}</span>}
+      {m[3] && <span className="text-white/40 text-[0.55em] ml-0.5 tracking-normal">{m[3]}</span>}
     </span>
   );
 }
@@ -78,11 +98,11 @@ export function CondBadge({ c }) {
 export function Kpi({ label, value, delta, tone, className = '' }) {
   return (
     <div className={`tile p-3.5 ${className}`}>
-      <div className="eyebrow !text-[10px]">{label}</div>
+      <div className="text-[11.5px] mute">{label}</div>
       <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-        <span className="text-[26px] font-light tracking-[-0.03em] leading-none">{value}</span>
+        <Num v={value} className="text-[26px] font-light tracking-[-0.03em] leading-none" />
         {delta && (
-          <span className="mono text-[10.5px]" style={{ color: tone || 'var(--bx-mute)' }}>
+          <span className="text-[10.5px]" style={{ color: tone || 'var(--bx-mute)' }}>
             {delta}
           </span>
         )}
@@ -91,23 +111,53 @@ export function Kpi({ label, value, delta, tone, className = '' }) {
   );
 }
 
-// Window chrome for a mocked platform screen.
+// A mocked platform view, styled as a VEXTO card: title, quiet meta, ↗.
 export function Screen({ title, meta, children, className = '' }) {
   return (
-    <Glass className={`overflow-hidden ${className}`}>
-      <div className="flex items-center justify-between gap-4 px-5 py-3.5 border-b hair">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex gap-1.5">
-            <span className="dot !w-[7px] !h-[7px] bg-white/15" />
-            <span className="dot !w-[7px] !h-[7px] bg-white/10" />
-            <span className="dot !w-[7px] !h-[7px] bg-white/[0.06]" />
-          </div>
-          <span className="text-[13px] tracking-[-0.01em] truncate">{title}</span>
+    <div className={`card overflow-hidden ${className}`}>
+      <div className="flex items-start justify-between gap-4 px-5 pt-4 pb-3">
+        <div className="min-w-0">
+          <div className="text-[15px] tracking-[-0.01em] truncate">{title}</div>
+          {meta && <div className="text-[11.5px] dim truncate mt-0.5">{meta}</div>}
         </div>
-        {meta && <span className="mono text-[10.5px] dim truncate hidden sm:block">{meta}</span>}
+        <ArrowUpRight className="w-4 h-4 mute flex-none mt-0.5" strokeWidth={1.5} />
       </div>
-      <div className="p-4 sm:p-5">{children}</div>
-    </Glass>
+      <div className="px-4 pb-4 sm:px-5 sm:pb-5">{children}</div>
+    </div>
+  );
+}
+
+// VEXTO's signature chart: a dense, jittery line, a highlighted vertical
+// band with two markers, and a dashed reference level.
+export function NoisyChart({ seed = 3, n = 160, h = 120, band = [0.62, 0.74], trend = 0.5, accent = false, axis = true, className = '' }) {
+  const W = 400;
+  const r = rng(seed);
+  const pts = [];
+  let v = 0.3;
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1);
+    v += (r() - 0.5) * 0.09 + (trend * 0.6) / n;
+    v = Math.max(0.05, Math.min(0.92, v + (t > band[0] && t < band[1] ? 0.012 : 0)));
+    pts.push([t * W, h - v * h]);
+  }
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const bx0 = band[0] * W;
+  const bx1 = band[1] * W;
+  const i0 = Math.round(band[0] * (n - 1));
+  const i1 = Math.round(band[1] * (n - 1));
+  const ref = (pts[i0][1] + pts[i1][1]) / 2;
+  const col = accent ? '#f08a3c' : '#ececec';
+  return (
+    <svg viewBox={`0 0 ${W} ${h + (axis ? 14 : 0)}`} className={`w-full overflow-visible ${className}`} preserveAspectRatio="none">
+      {[0.25, 0.5, 0.75].map((g) => (
+        <line key={g} x1="0" x2={W} y1={h * g} y2={h * g} stroke="#fff" strokeOpacity="0.04" />
+      ))}
+      <rect x={bx0} y="0" width={bx1 - bx0} height={h} fill="#fff" fillOpacity="0.05" />
+      <line x1="0" x2={W} y1={ref} y2={ref} stroke="#fff" strokeOpacity="0.35" strokeDasharray="3 4" vectorEffect="non-scaling-stroke" />
+      <path d={d} fill="none" stroke={col} strokeOpacity="0.85" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+      <circle cx={pts[i0][0]} cy={pts[i0][1]} r="3" fill="#fff" />
+      <circle cx={pts[i1][0]} cy={pts[i1][1]} r="3" fill="#fff" />
+    </svg>
   );
 }
 
@@ -163,12 +213,12 @@ const STREETS = buildStreets();
 
 export function CityMap({ selected, onSelect, compact = false, className = '' }) {
   return (
-    <div className={`relative overflow-hidden rounded-[14px] border hair bg-[#09090b] ${className}`}>
+    <div className={`relative overflow-hidden rounded-[14px] border hair bg-[#101010] ${className}`}>
       <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="absolute inset-0 block w-full h-full" preserveAspectRatio="xMidYMid slice">
         <defs>
           <radialGradient id="mapVignette" cx="50%" cy="45%" r="70%">
-            <stop offset="0.55" stopColor="#09090b" stopOpacity="0" />
-            <stop offset="1" stopColor="#050506" stopOpacity="0.95" />
+            <stop offset="0.55" stopColor="#101010" stopOpacity="0" />
+            <stop offset="1" stopColor="#0c0c0c" stopOpacity="0.95" />
           </radialGradient>
         </defs>
         {/* satellite base, graded down to sit behind the data */}
@@ -221,7 +271,7 @@ export function CityMap({ selected, onSelect, compact = false, className = '' })
                   fill="#ededef"
                   fillOpacity={on ? 1 : 0.55}
                   fontSize="12"
-                  fontFamily="Inter Tight, sans-serif"
+                  fontFamily="Helvetica Neue, Inter Tight, sans-serif"
                   style={{ letterSpacing: '-0.01em', pointerEvents: 'none' }}
                 >
                   {b.name}
@@ -234,7 +284,7 @@ export function CityMap({ selected, onSelect, compact = false, className = '' })
       <div className="absolute left-3 bottom-3 flex items-center gap-3 rounded-full px-3 py-1.5 bg-black/50 border hair backdrop-blur-md">
         {[1, 2, 3, 4, 5].map((c) => (
           <span key={c} className="inline-flex items-center gap-1 mono text-[10px] mute">
-            <CondDot c={c} /> C{c}
+            <CondDot c={c} /> {c}
           </span>
         ))}
       </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, ArrowUpRight, Menu, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, ArrowUpRight, CheckCircle2, ChevronUp, Menu, X } from 'lucide-react';
 import { PLATFORM_URL } from '@/config/site';
-import { Eyebrow, Glass, Reveal, CityMap, PORTFOLIO } from '@/components/buildings/kit';
+import { Eyebrow, Glass, NoisyChart, Num, Reveal, PORTFOLIO } from '@/components/buildings/kit';
 import {
   DashboardPanel,
   ConditionPanel,
@@ -24,13 +24,16 @@ import {
 // liquid-glass take on the platform, used to test a different design cue
 // with the facilities market. All data shown is illustrative.
 
-const HERO_IMG = '/media/buildings/map-aerial-angled.webp';
-const CLOSE_IMG = '/media/buildings/map-topdown-estuary.webp';
-const BAND_IMG = '/media/21e58ce44_abstract-ceiling-of-the-daxing-airport-2026-01-07-07-14-49-utc.webp';
+const M = '/media/buildings/';
+const HERO_IMG = `${M}map-aerial-angled.webp`;
+const CLOSE_IMG = `${M}map-topdown-estuary.webp`;
+const BAND_IMG = `${M}photo-park.webp`;
 
 const GROUPS = [
   {
     id: 'overview',
+    stat: { label: 'Portfolio', value: '57%', caption: 'average health' },
+    plate: { img: `${M}map-topdown-estuary.webp`, title: 'Portfolio status', sub: 'Moderate', body: 'AssetMind reads every inspection, sensor and work order and tells you where the portfolio stands this morning.', value: '57%' },
     n: '01',
     label: 'Dashboard',
     title: 'The whole portfolio, in one calm view.',
@@ -45,12 +48,14 @@ const GROUPS = [
   },
   {
     id: 'condition',
+    stat: { label: 'Condition', value: '4,108', caption: 'components rated' },
+    plate: { img: `${M}photo-atrium.webp`, title: 'Avg condition grade', sub: 'Average · 1 – 5 scale', body: 'Every component rated, photographed and mapped to its room.', value: '2.7' },
     n: '02',
     label: 'Condition assessment',
     title: 'Know the condition of every component.',
     intro: 'From a roof membrane to a fire panel — rated, photographed, mapped to the building and rolled into a 20-year plan.',
     features: [
-      { k: 'Condition overview', d: 'IPWEA C1–C5 ratings across every component, with photo evidence and element-level averages.', P: ConditionPanel },
+      { k: 'Condition overview', d: 'A 1 – 5 condition grade on every component, with photo evidence, rolled up by location.', P: ConditionPanel },
       { k: '20-year FWP', d: 'A forward works program built from condition and remaining life — by year, by trade, against budget.', P: FwpPanel },
       { k: 'Asset tree', d: 'Site → building → system → component. Drill to the smallest replaceable part and its history.', P: AssetTreePanel },
       { k: 'Digital twin', d: 'Walk the building remotely. Hotspots tie defects, sensors and findings to the exact location.', P: TwinPanel },
@@ -60,6 +65,8 @@ const GROUPS = [
   },
   {
     id: 'operations',
+    stat: { label: 'Days to failure', value: '47', caption: 'Pool Circulation Pump 2' },
+    plate: { img: `${M}photo-worker.webp`, title: 'Work order WO-4821', sub: 'Pump P-02 · bearing replacement', body: 'Raised automatically from the prediction and booked inside the failure window.', value: '9 days' },
     n: '03',
     label: 'Operations',
     title: 'Maintain on evidence, not on habit.',
@@ -71,6 +78,8 @@ const GROUPS = [
   },
   {
     id: 'intelligence',
+    stat: { label: 'Cost of waiting', value: '$142k', caption: 'vs $18k to fix today' },
+    plate: { img: `${M}photo-library-stair.webp`, title: 'Defect cascade', sub: 'Roof membrane · 24 mo', body: 'One small defect, modelled through the building it sits in.', value: '×7.9' },
     n: '04',
     label: 'Intelligence',
     title: 'See what a defect becomes.',
@@ -82,6 +91,8 @@ const GROUPS = [
   },
   {
     id: 'finance',
+    stat: { label: 'Risk reduced', value: '62%', caption: 'on a $0.6M budget' },
+    plate: { img: `${M}photo-office-team.webp`, title: 'Funding optimiser', sub: 'FY27 renewals', body: 'The project mix that removes the most risk for every dollar.', value: '$0.59M' },
     n: '05',
     label: 'Finance',
     title: 'Spend each dollar where it removes the most risk.',
@@ -163,6 +174,64 @@ function Nav() {
 
 // ─── Hero ──────────────────────────────────────────────────────────────────
 
+function HeroCards() {
+  return (
+    <div className="relative h-[460px] hidden md:block">
+      <Glass className="absolute right-0 top-0 w-[330px] p-5">
+        <div className="flex items-start justify-between">
+          <span className="text-[13px]">Portfolio health</span>
+          <ArrowUpRight className="w-4 h-4 mute" strokeWidth={1.5} />
+        </div>
+        <div className="mt-3 flex items-baseline gap-2">
+          <Num v="57.4" className="text-[44px] font-light tracking-[-0.04em] leading-none" />
+          <span className="text-[11px] mute">% · today</span>
+        </div>
+        <NoisyChart seed={11} n={140} h={70} band={[0.66, 0.8]} className="mt-4" axis={false} />
+        <div className="flex justify-between text-[10.5px] dim mt-2">
+          <span>2025</span>
+          <span>2026</span>
+        </div>
+      </Glass>
+      <div className="absolute left-0 top-[200px] w-[190px] space-y-2.5">
+        <Glass className="glass-sm p-4">
+          <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--bx-ok)' }} strokeWidth={2} />
+          <div className="mt-2 flex items-end justify-between">
+            <span className="text-[13px] mute">Operational</span>
+            <span className="text-[24px] font-light leading-none tracking-[-0.02em]">3,965</span>
+          </div>
+        </Glass>
+        <Glass className="glass-sm p-4">
+          <AlertTriangle className="w-4 h-4" style={{ color: 'var(--bx-alert)' }} strokeWidth={2} />
+          <div className="mt-2 flex items-end justify-between">
+            <span className="text-[13px] mute">Critical</span>
+            <span className="text-[24px] font-light leading-none tracking-[-0.02em]">143</span>
+          </div>
+        </Glass>
+      </div>
+      <Glass className="absolute right-0 bottom-0 w-[300px] p-4">
+        <div className="flex items-center justify-between text-[13px]">
+          <span>Warning</span>
+          <ChevronUp className="w-4 h-4 mute" />
+        </div>
+        <div className="mt-2 text-[12.5px] mute">Predicted failures (3 assets)</div>
+        <div className="mt-3 rounded-[14px] p-3" style={{ background: 'rgba(255,69,69,0.12)' }}>
+          <div className="flex items-center gap-2 text-[12.5px]">
+            <span className="w-4 h-4 rounded-full grid place-items-center text-[9px] font-medium" style={{ background: 'var(--bx-alert)' }}>
+              1
+            </span>
+            Pool Circulation Pump 2
+          </div>
+          <div className="mt-1 pl-6 text-[11.5px] mute">47 days RUL · bearing wear</div>
+          <div className="mt-2.5 pl-6 border-l hair ml-2 text-[11.5px]">
+            Aquatic Centre
+            <span className="block dim">Plant Room · work order raised</span>
+          </div>
+        </div>
+      </Glass>
+    </div>
+  );
+}
+
 function Hero() {
   return (
     <section className="relative min-h-[100svh] flex flex-col justify-end overflow-hidden">
@@ -170,73 +239,52 @@ function Hero() {
         src={HERO_IMG}
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: 'saturate(0.35) brightness(0.55) contrast(1.1)' }}
+        style={{ filter: 'saturate(0.55) brightness(0.62) contrast(1.05)' }}
         fetchpriority="high"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#050506]/70 via-[#050506]/30 to-[#050506]" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#050506]/80 via-transparent to-transparent" />
-      <div className="glow w-[520px] h-[520px] -right-40 top-10" style={{ background: '#1e36ee', opacity: 0.22 }} />
-      <div className="grain" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c0c]/80 via-[#0c0c0c]/10 to-[#0c0c0c]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0c0c0c]/85 via-[#0c0c0c]/20 to-transparent" />
 
       <div className="relative mx-auto w-full max-w-[1180px] px-4 sm:px-6 pt-36 pb-14 sm:pb-20">
-        <div className="grid lg:grid-cols-[1.25fr_1fr] gap-12 items-end">
+        <div className="grid lg:grid-cols-[1.1fr_1fr] gap-12 items-end">
           <div>
             <Reveal>
               <Eyebrow className="flex items-center gap-2">
-                <span className="dot pulse" style={{ background: 'var(--bx-signal)', color: 'var(--bx-signal)' }} />
+                <span className="dot pulse" style={{ background: 'var(--bx-orange)', color: 'var(--bx-orange)' }} />
                 AssetStack · Buildings &amp; Facilities
               </Eyebrow>
             </Reveal>
             <Reveal delay={80}>
-              <h1 className="display text-[44px] sm:text-[68px] lg:text-[84px] mt-6">
-                Every building.
+              <h1 className="display text-[46px] sm:text-[70px] lg:text-[84px] mt-6">
+                <span className="text-white/45">Every building.</span>
                 <br />
-                <span className="text-white/45">One quiet signal.</span>
+                One quiet signal.
               </h1>
             </Reveal>
             <Reveal delay={160}>
-              <p className="mt-7 max-w-[520px] text-[16px] sm:text-[17px] leading-[1.6] mute">
-                Condition, maintenance, risk and capital — for every building, plant room and component you own. AssetStack
-                turns inspections, sensors and work history into one program you can defend.
+              <p className="mt-7 max-w-[500px] text-[16px] leading-[1.6] mute">
+                Condition, maintenance, risk and capital for every building, room and component you own — read from your
+                inspections, sensors and work history, and turned into one program you can defend.
               </p>
             </Reveal>
             <Reveal delay={240} className="mt-9 flex flex-wrap gap-2.5">
               <a href="/Contact" className="btn btn-light">
-                Book a demo <ArrowRight className="w-4 h-4" />
+                Book a demo
               </a>
               <a href="#overview" className="btn btn-ghost">
-                Explore the platform
+                Explore the platform <ArrowRight className="w-4 h-4" />
               </a>
             </Reveal>
           </div>
-
-          <Reveal delay={320} className="hidden md:block">
-            <Glass className="p-4">
-              <div className="flex items-center justify-between px-1 pb-3">
-                <span className="text-[13px]">Portfolio</span>
-                <span className="mono text-[10.5px] dim">{PORTFOLIO.buildings} buildings · live</span>
-              </div>
-              <CityMap compact className="aspect-[16/10]" selected="AQU-03" />
-              <div className="grid grid-cols-3 gap-2 mt-2">
-                {[
-                  ['Avg condition', PORTFOLIO.avgCond],
-                  ['Critical', PORTFOLIO.critical],
-                  ['20-yr FWP', PORTFOLIO.fwp],
-                ].map(([k, v]) => (
-                  <div key={k} className="tile px-3 py-2.5">
-                    <div className="mono text-[9.5px] dim uppercase tracking-[0.12em]">{k}</div>
-                    <div className="text-[20px] font-light tracking-[-0.03em] mt-1">{v}</div>
-                  </div>
-                ))}
-              </div>
-            </Glass>
+          <Reveal delay={320}>
+            <HeroCards />
           </Reveal>
         </div>
 
         <Reveal delay={400} className="mt-16 sm:mt-24 grid grid-cols-2 sm:grid-cols-5 border-t hair">
           {GROUPS.map((g) => (
             <a key={g.id} href={`#${g.id}`} className="group pt-4 pr-4 pb-2">
-              <span className="mono text-[10.5px] dim">{g.n}</span>
+              <span className="text-[11px] dim tabular-nums">{g.n}</span>
               <span className="block mt-1 text-[14px] mute group-hover:text-white transition-colors">{g.label}</span>
             </a>
           ))}
@@ -246,7 +294,84 @@ function Hero() {
   );
 }
 
+// ─── Context: the problem, VEXTO "00.x" style ──────────────────────────────
+
+const PROBLEMS = [
+  ['00.1', 'Condition reports', 'live in PDFs that nobody re-reads once the budget is set.'],
+  ['00.2', 'Renewal budgets', 'get fixed before anyone knows which assets carry the risk.'],
+  ['00.3', 'Small defects', 'are deferred until they become capital works.'],
+];
+
+function Context() {
+  return (
+    <section className="relative py-24 sm:py-32">
+      <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
+        <div className="grid lg:grid-cols-[1.4fr_1fr] gap-10 items-center">
+          <Reveal>
+            <h2 className="display text-[36px] sm:text-[56px]">
+              Most portfolios are managed from
+              <span className="text-white/40"> spreadsheets, PDFs and memory.</span>
+            </h2>
+          </Reveal>
+          <Reveal delay={120} className="hidden lg:block">
+            <svg viewBox="0 0 360 220" className="w-full">
+              <path
+                d="M10,30 C60,20 70,80 120,90 S190,60 210,120 S260,200 350,190"
+                fill="none"
+                stroke="#fff"
+                strokeOpacity="0.55"
+                strokeDasharray="2 5"
+                className="flow"
+              />
+              <circle cx="210" cy="120" r="30" fill="none" stroke="#fff" strokeOpacity="0.25" strokeDasharray="2 4" />
+              <circle cx="210" cy="120" r="9" fill="#ececec" />
+              <circle cx="120" cy="90" r="3" fill="#f08a3c" />
+              <circle cx="350" cy="190" r="3" fill="#ececec" />
+            </svg>
+          </Reveal>
+        </div>
+        <div className="mt-14 grid md:grid-cols-3 gap-3">
+          {PROBLEMS.map(([n, k, d], i) => (
+            <Reveal key={n} delay={i * 80}>
+              <div className="card p-6 h-full overflow-hidden">
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'radial-gradient(80% 60% at 80% 0%, rgba(255,255,255,0.08), transparent 70%)' }}
+                />
+                <div className="relative flex items-start gap-1">
+                  <span className="text-[44px] font-extralight tracking-[-0.04em] text-white/25 leading-none">{n}</span>
+                  <span className="mt-1 w-[3px] h-[3px] rounded-full" style={{ background: 'var(--bx-orange)' }} />
+                </div>
+                <p className="relative mt-8 text-[15px] leading-[1.55]">
+                  {k} <span className="mute">{d}</span>
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Feature group ─────────────────────────────────────────────────────────
+
+function Plate({ p }) {
+  return (
+    <div className="plate h-full min-h-[360px] lg:min-h-[420px]">
+      <img src={p.img} alt="" loading="lazy" />
+      <Glass className="absolute left-5 right-5 bottom-5 sm:left-auto sm:w-[290px] p-5 z-10">
+        <div className="flex items-start justify-between">
+          <span className="text-[14px]">{p.title}</span>
+          <ArrowUpRight className="w-4 h-4 mute" strokeWidth={1.5} />
+        </div>
+        <div className="text-[12px] mute mt-0.5">{p.sub}</div>
+        <p className="mt-3 text-[12px] leading-[1.5] text-white/70">{p.body}</p>
+        <Num v={p.value} className="block mt-6 text-[46px] font-extralight tracking-[-0.04em] leading-none" />
+      </Glass>
+    </div>
+  );
+}
 
 function Group({ g }) {
   const [i, setI] = useState(0);
@@ -256,24 +381,48 @@ function Group({ g }) {
     <section id={g.id} className="relative scroll-mt-24 py-20 sm:py-28">
       <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
         <Reveal className="flex items-baseline gap-4 border-t hair pt-6">
-          <span className="mono text-[11px] dim">{g.n}</span>
+          <span className="text-[11px] dim tabular-nums">{g.n}</span>
           <Eyebrow>{g.label}</Eyebrow>
         </Reveal>
-        <div className="mt-10 grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2.1fr)] gap-10 lg:gap-14">
-          <div className="lg:sticky lg:top-28 self-start">
+
+        {/* intro: two-tone headline + figure, photo plate with glass stat */}
+        <div className="mt-10 grid lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-14 items-stretch">
+          <div className="flex flex-col">
             <Reveal>
-              <h2 className="display text-[34px] sm:text-[44px]">{g.title}</h2>
+              <h2 className="display text-[36px] sm:text-[48px]">
+                <span className="text-white/45">{g.title}</span>
+              </h2>
             </Reveal>
-            <Reveal delay={80}>
-              <p className="mt-5 text-[15px] leading-[1.65] mute max-w-[420px]">{g.intro}</p>
+            <Reveal delay={80} className="mt-10">
+              <div className="text-[13px] mute">{g.stat.label}</div>
+              <Num v={g.stat.value} className="block text-[64px] sm:text-[80px] font-extralight tracking-[-0.05em] leading-none mt-2" />
+              <div className="text-[13px] mute mt-2">{g.stat.caption}</div>
             </Reveal>
-            {!single && (
-              <Reveal delay={140} className="mt-8 hidden lg:block" role="tablist" aria-label={`${g.label} features`}>
+            <Reveal delay={140} className="mt-auto pt-10">
+              <span className="block w-10 h-px" style={{ background: 'var(--bx-orange)' }} />
+              <p className="mt-5 text-[15px] leading-[1.65] mute max-w-[440px]">{g.intro}</p>
+            </Reveal>
+          </div>
+          <Reveal delay={120}>
+            <Plate p={g.plate} />
+          </Reveal>
+        </div>
+
+        {/* the platform view */}
+        <div className="mt-14 grid lg:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] gap-10 lg:gap-12">
+          <div className="lg:sticky lg:top-28 self-start">
+            {single ? (
+              <Reveal>
+                <div className="text-[15px]">{F.k}</div>
+                <p className="mt-2 text-[13.5px] leading-[1.6] mute">{F.d}</p>
+              </Reveal>
+            ) : (
+              <Reveal className="hidden lg:block" role="tablist" aria-label={`${g.label} features`}>
                 {g.features.map((f, k) => (
                   <button key={f.k} type="button" role="tab" aria-selected={i === k} onClick={() => setI(k)} className="feat">
                     <span className="flex items-center justify-between text-[15px] tracking-[-0.01em]">
                       {f.k}
-                      <span className="mono text-[10px] dim">0{k + 1}</span>
+                      <span className="text-[10.5px] dim tabular-nums">0{k + 1}</span>
                     </span>
                     <span className="feat-body">
                       <span className="overflow-hidden">
@@ -319,7 +468,7 @@ function Group({ g }) {
 
 function Band() {
   const stats = [
-    ['C1–C5', 'IPWEA-aligned condition ratings on every component'],
+    ['1 – 5', 'Condition grade on every component, with photo evidence'],
     ['20 yrs', 'Forward works program, regenerated as conditions change'],
     ['ISO 55000', 'Audit-ready asset management reporting'],
     ['AU', 'Australian data residency'],
@@ -331,21 +480,21 @@ function Band() {
         alt=""
         loading="lazy"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: 'grayscale(1) brightness(0.28) contrast(1.2)' }}
+        style={{ filter: 'saturate(0.4) brightness(0.4) contrast(1.1)' }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#050506] via-[#050506]/40 to-[#050506]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c0c] via-[#0c0c0c]/30 to-[#0c0c0c]" />
       <div className="relative mx-auto max-w-[1180px] px-4 sm:px-6">
         <Reveal>
-          <h2 className="display text-[34px] sm:text-[52px] max-w-[820px]">
-            Built for the people who keep public buildings open.
+          <h2 className="display text-[36px] sm:text-[56px] max-w-[820px]">
+            <span className="text-white/45">Built for the people who</span> keep public buildings open.
           </h2>
         </Reveal>
         <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {stats.map(([k, d], i) => (
             <Reveal key={k} delay={i * 70}>
               <Glass className="p-6 h-full">
-                <div className="text-[30px] font-light tracking-[-0.03em]">{k}</div>
-                <div className="mt-3 text-[13.5px] leading-[1.55] mute">{d}</div>
+                <div className="text-[32px] font-extralight tracking-[-0.03em]">{k}</div>
+                <div className="mt-3 text-[13px] leading-[1.55] text-white/65">{d}</div>
               </Glass>
             </Reveal>
           ))}
@@ -365,19 +514,18 @@ function Closing() {
         alt=""
         loading="lazy"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: 'grayscale(0.6) brightness(0.32)' }}
+        style={{ filter: 'saturate(0.5) brightness(0.38)' }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#050506] via-[#050506]/50 to-[#050506]" />
-      <div className="glow w-[640px] h-[360px] left-1/2 -translate-x-1/2 top-1/3" style={{ background: '#1e36ee', opacity: 0.25 }} />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c0c] via-[#0c0c0c]/40 to-[#0c0c0c]" />
       <div className="relative mx-auto max-w-[1180px] px-4 sm:px-6 text-center">
         <Reveal>
           <img src="/media/buildings/as-icon-white.webp" alt="" width="40" height="40" className="w-10 h-10 mx-auto opacity-90" />
         </Reveal>
         <Reveal delay={80}>
-          <h2 className="display text-[40px] sm:text-[64px] mt-8">
-            See your buildings
+          <h2 className="display text-[42px] sm:text-[68px] mt-8">
+            <span className="text-white/45">See your buildings</span>
             <br />
-            <span className="text-white/45">the way we do.</span>
+            the way we do.
           </h2>
         </Reveal>
         <Reveal delay={160}>
@@ -387,7 +535,7 @@ function Closing() {
         </Reveal>
         <Reveal delay={240} className="mt-10 flex flex-wrap justify-center gap-2.5">
           <a href="/Contact" className="btn btn-light">
-            Book a demo <ArrowRight className="w-4 h-4" />
+            Book a demo
           </a>
           <a href="/Product" className="btn btn-ghost">
             Full platform <ArrowUpRight className="w-4 h-4" />
@@ -427,6 +575,7 @@ export default function Buildings() {
       <Nav />
       <main>
         <Hero />
+        <Context />
         {GROUPS.map((g) => (
           <Group key={g.id} g={g} />
         ))}

@@ -1,51 +1,64 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ChevronRight, Search, Thermometer, Activity, Zap, Droplets } from 'lucide-react';
-import { BUILDINGS, COND, PORTFOLIO, CityMap, CondBadge, CondDot, Kpi, Screen, Sparkline, rng, fmtM } from './kit';
+import { Thermometer, Activity, Zap, Droplets } from 'lucide-react';
+import { BUILDINGS, COND, PORTFOLIO, CityMap, CondBadge, CondDot, Kpi, NoisyChart, Num, Screen, Sparkline, rng, fmtK, fmtM } from './kit';
 
 // ─── Dashboard ─────────────────────────────────────────────────────────────
-
-const HEALTH_TREND = [71, 72, 71, 73, 74, 73, 75, 76, 75, 77, 78, 78, 79, 81];
 
 export function DashboardPanel() {
   const [sel, setSel] = useState('AQU-03');
   const b = BUILDINGS.find((x) => x.id === sel);
   return (
-    <Screen title="Portfolio overview" meta={`${PORTFOLIO.name} · ${PORTFOLIO.buildings} buildings`}>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-        <Kpi label="Portfolio health" value="81%" delta="▲ 3.2" tone="var(--bx-signal)" />
-        <Kpi label="Avg condition" value={PORTFOLIO.avgCond} delta="C1–C5" />
-        <Kpi label="Critical defects" value={PORTFOLIO.critical} delta="▼ 4 wk" tone="var(--bx-signal)" />
-        <Kpi label="20-yr FWP" value={PORTFOLIO.fwp} delta="indexed" />
+    <Screen title="Dashboard" meta={`${PORTFOLIO.name} · ${PORTFOLIO.buildings} locations · ${PORTFOLIO.components} assets`}>
+      <div className="tile p-4 relative overflow-hidden">
+        <div className="absolute -right-10 -top-16 w-64 h-40 rounded-full blur-3xl" style={{ background: 'rgba(240,138,60,0.18)' }} />
+        <div className="relative flex flex-wrap items-baseline justify-between gap-2">
+          <div className="text-[11.5px] mute">AssetMind insight</div>
+          <span className="chip">Updated 4 min ago</span>
+        </div>
+        <div className="relative mt-2 text-[19px] font-light tracking-[-0.02em]">
+          Portfolio status: <span style={{ color: 'var(--bx-orange)' }}>Moderate</span>
+          <span className="mute"> · {PORTFOLIO.health} avg health</span>
+        </div>
+        <div className="relative grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-[12px]">
+          {[
+            ['Peak renewal year', PORTFOLIO.peakYear],
+            ['Avg remaining life', `${PORTFOLIO.remLife} yrs`],
+            ['Critical priority', PORTFOLIO.critical],
+            ['Assessment coverage', '100%'],
+          ].map(([k, v]) => (
+            <div key={k}>
+              <div className="dim text-[11px]">{k}</div>
+              <Num v={v} className="block mt-1 text-[20px] font-light tracking-[-0.02em]" />
+            </div>
+          ))}
+        </div>
       </div>
       <div className="mt-2.5 grid lg:grid-cols-[1.6fr_1fr] gap-2.5">
-        <CityMap selected={sel} onSelect={setSel} compact className="aspect-[16/10] lg:aspect-auto lg:min-h-[340px]" />
+        <CityMap selected={sel} onSelect={setSel} compact className="aspect-[16/10] lg:aspect-auto lg:min-h-[320px]" />
         <div className="flex flex-col gap-2.5">
           <div className="tile p-4">
             <div className="flex items-center justify-between">
-              <span className="eyebrow !text-[10px]">{b.id}</span>
+              <span className="text-[11.5px] mute">{b.type}</span>
               <CondBadge c={b.cond} />
             </div>
             <div className="mt-2 text-[17px] tracking-[-0.02em]">{b.name}</div>
-            <div className="mono text-[11px] dim mt-0.5">
-              {b.type} · {b.gfa}
-            </div>
             <div className="mt-4 flex items-end justify-between">
               <div>
-                <div className="eyebrow !text-[10px]">Risk score</div>
+                <div className="text-[11px] dim">Risk score</div>
                 <div className="text-[30px] font-light leading-none mt-1 tracking-[-0.03em]">{b.risk}</div>
               </div>
               <div className="w-1/2">
-                <Sparkline data={HEALTH_TREND.map((v, i) => v - b.risk / 10 + Math.sin(i + b.risk) * 2)} h={36} />
+                <NoisyChart seed={b.risk} n={60} h={40} axis={false} band={[0.7, 0.82]} />
               </div>
             </div>
           </div>
           <div className="tile p-4 flex-1">
-            <div className="eyebrow !text-[10px] mb-3">Live alerts</div>
+            <div className="text-[11.5px] mute mb-3">Alerts</div>
             <ul className="space-y-2.5 text-[12.5px]">
               {[
-                [5, 'Aquatic Centre', 'Chiller compressor — vibration 4σ'],
-                [4, 'Eastside Hall', 'Roof membrane — ingress reported'],
-                [3, 'Works Depot', 'Switchboard thermal — +11 °C'],
+                [5, 'Aquatic Centre', 'Pool Circulation Pump 2 · 47 days RUL'],
+                [4, 'Community Hall', 'Roof membrane · ingress reported'],
+                [3, 'Works Depot', 'Switchboard thermal · +11 °C'],
               ].map(([c, n, t]) => (
                 <li key={t} className="flex gap-2.5">
                   <span className="mt-1.5">
@@ -65,163 +78,218 @@ export function DashboardPanel() {
   );
 }
 
-// ─── Condition Assessment overview ─────────────────────────────────────────
+// ─── Condition assessment overview ─────────────────────────────────────────
 
 const DIST = [
-  { c: 1, n: 912 },
-  { c: 2, n: 2140 },
-  { c: 3, n: 1986 },
-  { c: 4, n: 884 },
-  { c: 5, n: 290 },
+  { c: 1, n: 612 },
+  { c: 2, n: 1384 },
+  { c: 3, n: 1290 },
+  { c: 4, n: 679 },
+  { c: 5, n: 143 },
 ];
-const ELEMENTS = [
-  ['Roof & rainwater', 3.4],
-  ['External fabric', 2.7],
-  ['HVAC & mechanical', 3.6],
-  ['Electrical', 2.9],
-  ['Hydraulics', 3.1],
-  ['Fire services', 2.2],
-  ['Internal finishes', 2.5],
+const BY_LOCATION = [
+  ['Aquatic Centre', 412, 2.9, '$2.70M'],
+  ['Council Chambers & Administration', 1084, 2.6, '$1.92M'],
+  ['Library & Gallery', 506, 2.3, '$0.88M'],
+  ['Sports Complex', 638, 2.8, '$1.41M'],
+  ['Community Hall', 274, 3.3, '$0.61M'],
 ];
 
 export function ConditionPanel() {
   const total = DIST.reduce((a, d) => a + d.n, 0);
   return (
-    <Screen title="Condition assessment" meta="Sample portfolio · inspected Q3">
-      <div className="grid sm:grid-cols-3 gap-2.5">
-        <Kpi label="Components rated" value={PORTFOLIO.components} />
-        <Kpi label="Avg condition" value={PORTFOLIO.avgCond} delta="▲ 0.1 yoy" tone="var(--bx-c4)" />
-        <Kpi label="Photo evidence" value="94%" delta="AI-scored" />
+    <Screen title="Condition assessment" meta="Building condition assessment · 7 locations combined">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <Kpi label="Components" value={PORTFOLIO.components} />
+        <Kpi label="Avg condition grade" value={PORTFOLIO.avgCond} delta="1 Excellent – 5 Very poor" />
+        <Kpi label="Replacement cost" value="$7.52M" />
+        <Kpi label="20-yr program" value="$4.11M" delta="escalated" />
       </div>
       <div className="tile p-4 mt-2.5">
         <div className="flex items-center justify-between mb-3">
-          <span className="eyebrow !text-[10px]">Distribution · IPWEA C1–C5</span>
-          <span className="mono text-[10.5px] dim">{total.toLocaleString()} components</span>
+          <span className="text-[11.5px] mute">Condition distribution</span>
+          <span className="text-[11px] dim">{total.toLocaleString()} components</span>
         </div>
-        <div className="flex h-9 rounded-[8px] overflow-hidden gap-[2px]">
+        <div className="space-y-2">
           {DIST.map((d) => (
-            <div
-              key={d.c}
-              className="relative group"
-              style={{ width: `${(d.n / total) * 100}%`, background: COND[d.c].color, opacity: 0.85 }}
-              title={`C${d.c} ${COND[d.c].label}: ${d.n}`}
-            />
-          ))}
-        </div>
-        <div className="grid grid-cols-5 mt-3 text-[11.5px]">
-          {DIST.map((d) => (
-            <div key={d.c}>
-              <div className="flex items-center gap-1.5 mute">
-                <CondDot c={d.c} /> C{d.c}
+            <div key={d.c} className="grid grid-cols-[110px_1fr_48px] items-center gap-3 text-[12px]">
+              <span className="flex items-center gap-2 mute">
+                <CondDot c={d.c} /> {d.c} · {COND[d.c].label}
+              </span>
+              <div className="h-[6px] rounded-full bg-white/[0.05] overflow-hidden">
+                <div className="h-full rounded-full" style={{ width: `${(d.n / 1400) * 100}%`, background: COND[d.c].color }} />
               </div>
-              <div className="mt-0.5 tracking-[-0.01em]">{Math.round((d.n / total) * 100)}%</div>
+              <span className="text-right tabular-nums">{d.n}</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="tile p-4 mt-2.5">
-        <div className="eyebrow !text-[10px] mb-3">Average condition by element</div>
-        <div className="space-y-2.5">
-          {ELEMENTS.map(([n, v]) => {
-            const c = Math.min(5, Math.max(1, Math.round(v)));
-            return (
-              <div key={n} className="grid grid-cols-[1fr_2fr_auto] items-center gap-3 text-[12.5px]">
-                <span className="mute truncate">{n}</span>
-                <div className="h-[3px] rounded-full bg-white/[0.06] overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${(v / 5) * 100}%`, background: COND[c].color }} />
-                </div>
-                <span className="mono text-[11px] w-8 text-right">{v.toFixed(1)}</span>
-              </div>
-            );
-          })}
-        </div>
+      <div className="tile mt-2.5 overflow-x-auto">
+        <table className="w-full text-[12.5px] min-w-[480px]">
+          <thead>
+            <tr className="text-left text-[11px] dim">
+              <th className="font-normal px-4 py-3 border-b hair">Location</th>
+              <th className="font-normal px-4 py-3 border-b hair text-right">Assets</th>
+              <th className="font-normal px-4 py-3 border-b hair text-right">Avg grade</th>
+              <th className="font-normal px-4 py-3 border-b hair text-right">20-yr forecast</th>
+            </tr>
+          </thead>
+          <tbody>
+            {BY_LOCATION.map(([n, a, g, f]) => (
+              <tr key={n}>
+                <td className="px-4 py-2.5 border-b hair">{n}</td>
+                <td className="px-4 py-2.5 border-b hair text-right mute tabular-nums">{a}</td>
+                <td className="px-4 py-2.5 border-b hair text-right tabular-nums" style={{ color: g >= 3 ? 'var(--bx-orange)' : undefined }}>
+                  {g.toFixed(1)}
+                </td>
+                <td className="px-4 py-2.5 border-b hair text-right tabular-nums">{f}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </Screen>
   );
 }
 
 // ─── 20-year Forward Works Program ─────────────────────────────────────────
+// Mirrors the platform's "Program by Room" + "Sum of annual cost by group"
+// views for one building (Aquatic Centre, $2,703,471 over 20 years).
 
-const FWP_CATS = [
-  { k: 'Roof', col: '#ededef' },
-  { k: 'Mechanical', col: '#9aa3ff' },
-  { k: 'Electrical', col: '#5a67e8' },
-  { k: 'Fabric', col: '#6b6b74' },
-  { k: 'Hydraulic', col: '#3a3a42' },
+const ROOMS = [
+  ['R01', '25m Pool Hall', 1593509],
+  ['R02', 'Leisure Pool Area', 300417],
+  ['R08', 'External & Carpark', 340357],
+  ['R03', 'Plant Room', 165225],
+  ['R04', 'Male Change Rooms', 87889],
+  ['R05', 'Female Change Rooms', 73641],
+  ['R06', 'Reception & Foyer', 71764],
+  ['R07', 'Kiosk & Seating', 49095],
+  ['R09', 'Amenities & Store', 11612],
+  ['R10', 'First Aid & Office', 9962],
 ];
+const FWP_TOTAL = ROOMS.reduce((a, r) => a + r[2], 0);
+const GROUPS = [
+  { k: 'Roof', col: '#ececec' },
+  { k: 'Mechanical', col: '#f08a3c' },
+  { k: 'Electrical', col: '#9a9a9a' },
+  { k: 'Finishes', col: '#5e5e5e' },
+  { k: 'Hydraulic', col: '#3a3a3a' },
+];
+const PROGRAMS = { 'Must do': 0.62, Balanced: 1, Premium: 1.32 };
 
 function buildFwp() {
   const r = rng(42);
+  // lumpy renewal profile: a few big years, a long quiet tail
+  const spikes = { 1: 1.6, 6: 2.6, 13: 1.8, 18: 3.4 };
   return Array.from({ length: 20 }, (_, i) => {
-    const year = 2027 + i;
-    const wave = 1 + 0.55 * Math.sin(i / 2.6) + (i === 6 || i === 13 ? 0.9 : 0);
-    const parts = FWP_CATS.map((_, k) => (0.35 + r() * 0.9) * wave * (k === 1 ? 1.4 : 1) * 0.62e6);
-    return { year, parts, total: parts.reduce((a, b) => a + b, 0) };
+    const base = 0.25 + r() * 0.5 + (spikes[i] || 0);
+    const parts = GROUPS.map((_, k) => base * (0.4 + r() * (k === 1 ? 1.2 : 0.8)));
+    return { year: 2027 + i, parts };
   });
 }
 
 export function FwpPanel() {
-  const data = useMemo(buildFwp, []);
-  const [hover, setHover] = useState(6);
-  const max = Math.max(...data.map((d) => d.total));
-  const budget = 4.2e6;
-  const sum = data.reduce((a, d) => a + d.total, 0);
+  const raw = useMemo(buildFwp, []);
+  const [prog, setProg] = useState('Balanced');
+  const [hover, setHover] = useState(18);
+  const scale = PROGRAMS[prog];
+  const rawSum = raw.reduce((a, d) => a + d.parts.reduce((x, y) => x + y, 0), 0);
+  const k = (FWP_TOTAL * scale) / rawSum;
+  const data = raw.map((d) => ({ ...d, parts: d.parts.map((p) => p * k), total: d.parts.reduce((x, y) => x + y, 0) * k }));
+  const max = Math.max(...raw.map((d) => d.parts.reduce((x, y) => x + y, 0))) * (FWP_TOTAL * PROGRAMS.Premium) / rawSum;
   const h = data[hover];
+  const roomMax = ROOMS[0][2];
   return (
-    <Screen title="20-year forward works program" meta="Renewals · 2027 – 2046 · real $">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <Kpi label="20-yr total" value={fmtM(sum)} />
-        <Kpi label="Peak year" value={data.reduce((a, d) => (d.total > a.total ? d : a)).year} />
-        <Kpi label="Annual budget" value={fmtM(budget)} />
-        <Kpi label="Selected" value={h.year} delta={fmtM(h.total)} />
-      </div>
-      <div className="tile p-4 mt-2.5">
-        <div className="relative h-[220px] flex items-end gap-[3px] sm:gap-[5px]" onMouseLeave={() => setHover(6)}>
-          <div
-            className="absolute left-0 right-0 border-t border-dashed border-white/30 pointer-events-none"
-            style={{ bottom: `${(budget / max) * 100}%` }}
-          >
-            <span className="absolute right-0 -top-5 mono text-[10px] mute">budget {fmtM(budget)}</span>
-          </div>
-          {data.map((d, i) => (
+    <Screen title="20-year forward works program" meta="Aquatic Centre · 10 rooms · escalated at 3% p.a.">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="text-[11.5px] mute">20-yr program · {prog}</div>
+          <Num v={fmtM(FWP_TOTAL * scale)} className="block text-[34px] font-light tracking-[-0.03em] leading-none mt-1.5" />
+        </div>
+        <div className="flex gap-1 p-1 rounded-full bg-white/[0.04] border hair">
+          {Object.keys(PROGRAMS).map((p) => (
             <button
-              key={d.year}
+              key={p}
               type="button"
-              aria-label={`${d.year}: ${fmtM(d.total)}`}
-              onMouseEnter={() => setHover(i)}
-              onFocus={() => setHover(i)}
-              className="relative flex-1 h-full flex flex-col-reverse"
+              onClick={() => setProg(p)}
+              className={`px-3 py-1 rounded-full text-[12px] transition-colors ${prog === p ? 'bg-[#d9d9d9] text-black' : 'mute hover:text-white'}`}
             >
-              {d.parts.map((p, k) => (
-                <span
-                  key={k}
-                  className="block w-full transition-opacity duration-300"
-                  style={{
-                    height: `${(p / max) * 100}%`,
-                    background: FWP_CATS[k].col,
-                    opacity: hover === i ? 1 : 0.42,
-                    borderRadius: k === d.parts.length - 1 ? '3px 3px 0 0' : 0,
-                    marginTop: 1,
-                  }}
-                />
-              ))}
+              {p}
             </button>
           ))}
         </div>
-        <div className="flex justify-between mono text-[10px] dim mt-2">
-          <span>2027</span>
-          <span>2031</span>
-          <span>2036</span>
-          <span>2041</span>
-          <span>2046</span>
-        </div>
-        <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
-          {FWP_CATS.map((c, k) => (
-            <span key={c.k} className="inline-flex items-center gap-1.5 text-[11.5px] mute">
-              <span className="w-2 h-2 rounded-[2px]" style={{ background: c.col }} />
-              {c.k} <span className="mono text-[10.5px] dim">{fmtM(h.parts[k])}</span>
+      </div>
+      <div className="grid lg:grid-cols-[1.5fr_1fr] gap-2.5 mt-4">
+        <div className="tile p-4">
+          <div className="flex justify-between text-[11.5px] mb-3">
+            <span className="mute">Annual cost by group</span>
+            <span>
+              {h.year} · <span className="tabular-nums">{fmtK(h.total)}</span>
             </span>
-          ))}
+          </div>
+          <div className="relative h-[200px] flex items-end gap-[3px]">
+            {data.map((d, i) => (
+              <button
+                key={d.year}
+                type="button"
+                aria-label={`${d.year}: ${fmtK(d.total)}`}
+                onMouseEnter={() => setHover(i)}
+                onFocus={() => setHover(i)}
+                onClick={() => setHover(i)}
+                className="relative flex-1 h-full flex flex-col-reverse"
+              >
+                {i === hover && <span className="absolute inset-x-[-2px] top-0 bottom-0 bg-white/[0.05] rounded-[3px]" />}
+                {d.parts.map((p, j) => (
+                  <span
+                    key={j}
+                    className="relative block w-full transition-all duration-500"
+                    style={{
+                      height: `${(p / max) * 100}%`,
+                      background: GROUPS[j].col,
+                      opacity: hover === i ? 1 : 0.55,
+                      borderRadius: j === d.parts.length - 1 ? '2px 2px 0 0' : 0,
+                      marginTop: 1,
+                    }}
+                  />
+                ))}
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-between text-[10.5px] dim mt-2 tabular-nums">
+            <span>2027</span>
+            <span>2032</span>
+            <span>2037</span>
+            <span>2042</span>
+            <span>2046</span>
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
+            {GROUPS.map((c) => (
+              <span key={c.k} className="inline-flex items-center gap-1.5 text-[11.5px] mute">
+                <span className="w-2 h-2 rounded-[2px]" style={{ background: c.col }} />
+                {c.k}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="tile p-4">
+          <div className="text-[11.5px] mute mb-3">Program by room</div>
+          <ul className="space-y-2">
+            {ROOMS.slice(0, 7).map(([id, n, v]) => (
+              <li key={id} className="text-[12px]">
+                <div className="flex justify-between gap-2">
+                  <span className="truncate">
+                    <span className="dim mr-1.5">{id}</span>
+                    {n}
+                  </span>
+                  <span className="tabular-nums">{fmtK(v * scale)}</span>
+                </div>
+                <div className="h-[2px] mt-1.5 bg-white/[0.05] rounded-full">
+                  <div className="h-full rounded-full" style={{ width: `${(v / roomMax) * 100}%`, background: id === 'R01' ? 'var(--bx-orange)' : 'rgba(236,236,236,.6)' }} />
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </Screen>
@@ -229,115 +297,123 @@ export function FwpPanel() {
 }
 
 // ─── Asset tree ────────────────────────────────────────────────────────────
+// The platform's register graph: All locations → location → room → asset.
 
-const TREE = {
-  name: 'Sample council portfolio',
-  meta: '48 sites',
-  open: true,
-  children: [
-    {
-      name: 'Aquatic Centre',
-      meta: '412',
-      cond: 4,
-      open: true,
-      children: [
-        {
-          name: 'Plant room',
-          meta: '38',
-          open: true,
-          children: [
-            { name: 'Chiller CH-01', cond: 5, tag: 'vibration 4σ' },
-            { name: 'Pool filtration pump P-02', cond: 3 },
-            { name: 'Boiler B-01', cond: 2 },
-          ],
-        },
-        { name: 'Roof & envelope', meta: '24', children: [{ name: 'Membrane — Zone B', cond: 4 }] },
-        { name: 'Electrical', meta: '61', children: [{ name: 'Main switchboard MSB', cond: 3 }] },
-      ],
-    },
-    {
-      name: 'Civic Centre',
-      meta: '1,084',
-      cond: 3,
-      children: [
-        { name: 'Lifts', meta: '3', children: [{ name: 'Passenger lift L1', cond: 3, tag: 'service due 4d' }] },
-        { name: 'HVAC', meta: '46', children: [{ name: 'AHU-03', cond: 2 }] },
-      ],
-    },
-    { name: 'Central Library', meta: '506', cond: 2, children: [{ name: 'Fire services', meta: '88', children: [] }] },
-  ],
-};
-
-function TreeNode({ node, depth, onPick, picked }) {
-  const [open, setOpen] = useState(!!node.open);
-  const leaf = !node.children;
-  const isPicked = picked === node.name;
-  return (
-    <li>
-      <button
-        type="button"
-        onClick={() => (leaf ? onPick(node.name) : setOpen((o) => !o))}
-        className={`w-full flex items-center gap-2 py-[7px] pr-2 rounded-[8px] text-left text-[12.5px] transition-colors ${
-          isPicked ? 'bg-white/[0.07]' : 'hover:bg-white/[0.035]'
-        }`}
-        style={{ paddingLeft: 8 + depth * 16 }}
-      >
-        {leaf ? (
-          <span className="w-3.5" />
-        ) : (
-          <ChevronRight className={`w-3.5 h-3.5 dim transition-transform ${open ? 'rotate-90' : ''}`} />
-        )}
-        {node.cond && <CondDot c={node.cond} pulse={node.cond === 5} />}
-        <span className={leaf ? 'text-white/85' : ''}>{node.name}</span>
-        {node.tag && <span className="chip !text-[9.5px] !py-[1px] ml-1">{node.tag}</span>}
-        {node.meta && <span className="ml-auto mono text-[10.5px] dim">{node.meta}</span>}
-      </button>
-      {!leaf && open && node.children.length > 0 && (
-        <ul>
-          {node.children.map((c) => (
-            <TreeNode key={c.name} node={c} depth={depth + 1} onPick={onPick} picked={picked} />
-          ))}
-        </ul>
-      )}
-    </li>
-  );
-}
+const LOCS = [
+  { n: 'Aquatic Centre', a: 412, crit: 31, rooms: ['25m Pool Hall', 'Leisure Pool', 'Plant Room', 'Change Rooms', 'Reception'] },
+  { n: 'Council Chambers', a: 1084, crit: 24, rooms: ['Chamber', 'Offices L1', 'Offices L2', 'Lifts', 'Plant'] },
+  { n: 'Library & Gallery', a: 506, crit: 9, rooms: ['Reading Room', 'Gallery', 'Archive', 'Amenities', 'Roof'] },
+  { n: 'Sports Complex', a: 638, crit: 18, rooms: ['Courts', 'Gym', 'Change Rooms', 'Kiosk', 'Plant'] },
+  { n: 'Community Hall', a: 274, crit: 14, rooms: ['Main Hall', 'Kitchen', 'Stage', 'Amenities', 'Roof'] },
+  { n: 'Works Depot', a: 690, crit: 21, rooms: ['Workshop', 'Wash Bay', 'Stores', 'Offices', 'Yard'] },
+  { n: 'Airport Terminal', a: 504, crit: 26, rooms: ['Departures', 'Arrivals', 'Baggage', 'Kiosk', 'Plant'] },
+];
+const ROOM_ASSETS = [
+  ['Floor / wall tiles (inc. splashback)', 1, 'Bathroom'],
+  ['Circulation pump P-02', 5, 'Mechanical'],
+  ['Ceiling panels', 3, 'Ceiling'],
+  ['LED high-bay lighting', 2, 'Electrical'],
+];
 
 export function AssetTreePanel() {
-  const [picked, setPicked] = useState('Chiller CH-01');
+  const [li, setLi] = useState(0);
+  const [ri, setRi] = useState(2);
+  const W = 640;
+  const loc = LOCS[li];
+  const lx = (i) => 40 + (i * (W - 80)) / (LOCS.length - 1);
+  const rx = (i) => 110 + (i * (W - 220)) / (loc.rooms.length - 1);
   return (
-    <Screen title="Asset tree" meta="Site → building → system → component">
-      <div className="grid lg:grid-cols-[1.25fr_1fr] gap-2.5">
-        <div className="tile p-2">
-          <div className="flex items-center gap-2 px-2 py-2 mb-1 border-b hair">
-            <Search className="w-3.5 h-3.5 dim" />
-            <span className="text-[12px] dim">Search 6,212 components</span>
-          </div>
-          <ul>
-            <TreeNode node={TREE} depth={0} onPick={setPicked} picked={picked} />
-          </ul>
-        </div>
-        <div className="tile p-4 flex flex-col">
-          <div className="eyebrow !text-[10px]">Component</div>
-          <div className="mt-2 text-[17px] tracking-[-0.02em]">{picked}</div>
-          <div className="mt-4 grid grid-cols-2 gap-3 text-[12px]">
+    <Screen title="Asset register" meta="Every asset organised by Location → Room → Asset — one defensible register">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <Kpi label="Total assets" value={PORTFOLIO.components} />
+        <Kpi label="Locations" value={PORTFOLIO.buildings} />
+        <Kpi label="Rooms" value={PORTFOLIO.rooms} />
+        <Kpi label="Critical" value={PORTFOLIO.critical} tone="var(--bx-alert)" delta="● flagged" />
+      </div>
+      <div className="grid gap-2.5 mt-2.5">
+        <div className="tile p-2 overflow-x-auto">
+          <svg viewBox={`0 0 ${W} 330`} className="w-full min-w-[540px]">
+            {/* root */}
+            {LOCS.map((l, i) => (
+              <path
+                key={l.n}
+                d={`M${W / 2},52 C${W / 2},100 ${lx(i)},90 ${lx(i)},138`}
+                fill="none"
+                stroke="#fff"
+                strokeOpacity={i === li ? 0.55 : 0.12}
+              />
+            ))}
+            {loc.rooms.map((r, i) => (
+              <path
+                key={r}
+                d={`M${lx(li)},158 C${lx(li)},210 ${rx(i)},200 ${rx(i)},248`}
+                fill="none"
+                stroke="#fff"
+                strokeOpacity={i === ri ? 0.55 : 0.14}
+                className={i === ri ? 'flow' : ''}
+              />
+            ))}
+            <g transform={`translate(${W / 2} 38)`}>
+              <circle r="16" fill="#1b1b1b" stroke="#fff" strokeOpacity="0.6" />
+              <circle r="4" fill="#ececec" />
+              <text y="34" textAnchor="middle" fill="#ececec" fontSize="11" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
+                All locations
+              </text>
+            </g>
+            {LOCS.map((l, i) => (
+              <g key={l.n} transform={`translate(${lx(i)} 148)`} onClick={() => { setLi(i); setRi(0); }} style={{ cursor: 'pointer' }}>
+                <circle r="20" fill="transparent" />
+                <circle r="11" fill={i === li ? '#ececec' : '#1b1b1b'} stroke="#fff" strokeOpacity={i === li ? 1 : 0.35} />
+                {l.crit > 20 && <circle cx="8" cy="-8" r="3.5" fill="#ff4545" />}
+                <text y="28" textAnchor="middle" fill="#ececec" fillOpacity={i === li ? 1 : 0.5} fontSize="10" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
+                  {l.n.split(' ')[0]}
+                </text>
+              </g>
+            ))}
+            {loc.rooms.map((r, i) => (
+              <g key={r} transform={`translate(${rx(i)} 258)`} onClick={() => setRi(i)} style={{ cursor: 'pointer' }}>
+                <circle r="18" fill="transparent" />
+                <rect x="-8" y="-8" width="16" height="16" rx="5" fill={i === ri ? '#f08a3c' : '#1b1b1b'} stroke="#fff" strokeOpacity={i === ri ? 0 : 0.3} />
+                <text y="26" textAnchor="middle" fill="#ececec" fillOpacity={i === ri ? 1 : 0.5} fontSize="10" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
+                  {r}
+                </text>
+              </g>
+            ))}
+          </svg>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 px-3 pb-2 text-[11px] mute">
             {[
-              ['Install year', '2009'],
-              ['Useful life', '20 yrs'],
-              ['Remaining', '3.2 yrs'],
-              ['Replacement', '$184,000'],
-              ['Criticality', 'High'],
-              ['Last inspected', '14 days'],
-            ].map(([k, v]) => (
-              <div key={k}>
-                <div className="dim text-[11px]">{k}</div>
-                <div className="mt-0.5">{v}</div>
-              </div>
+              ['Operational', 'var(--bx-c1)'],
+              ['Degraded', 'var(--bx-c3)'],
+              ['Critical', 'var(--bx-alert)'],
+              ['Maintenance', 'var(--bx-orange)'],
+            ].map(([k, c]) => (
+              <span key={k} className="inline-flex items-center gap-1.5">
+                <span className="dot" style={{ background: c }} /> {k}
+              </span>
             ))}
           </div>
-          <div className="mt-auto pt-4">
-            <div className="eyebrow !text-[10px] mb-2">Health · 90 days</div>
-            <Sparkline data={[82, 81, 80, 80, 78, 77, 77, 74, 72, 70, 66, 63, 61]} h={44} stroke="#f59d4c" />
+        </div>
+        <div className="tile p-4 grid sm:grid-cols-[1.4fr_1fr] gap-5">
+          <div>
+          <div className="text-[11.5px] mute">
+            {loc.n} · {loc.rooms[ri]}
+          </div>
+          <div className="mt-1 text-[12px] dim">
+            {loc.a} assets · {loc.crit} critical
+          </div>
+          <ul className="mt-4 space-y-1.5">
+            {ROOM_ASSETS.map(([n, c, g]) => (
+              <li key={n} className="flex items-center gap-2.5 rounded-[10px] bg-white/[0.03] px-3 py-2 text-[12px]">
+                <CondDot c={c} pulse={c === 5} />
+                <span className="flex-1 min-w-0 truncate">{n}</span>
+                <span className="dim text-[11px]">{g}</span>
+              </li>
+            ))}
+          </ul>
+          </div>
+          <div className="self-end">
+            <div className="text-[11px] dim mb-2">Condition · last 90 days</div>
+            <NoisyChart seed={li * 7 + ri + 2} n={70} h={44} axis={false} band={[0.55, 0.7]} />
           </div>
         </div>
       </div>
@@ -393,7 +469,7 @@ export function TwinPanel() {
   const spots = HOTSPOTS[lvl];
   const spot = spots[Math.min(hs, spots.length - 1)];
   return (
-    <Screen title="Digital twin — Aquatic Centre" meta="3D · plan · linked findings">
+    <Screen title="Digital twins" meta="Aquatic Centre · Matterport 3D tour · 12 of 12 locations captured">
       <div className="grid lg:grid-cols-[1.5fr_1fr] gap-2.5">
         <div className="tile relative overflow-hidden aspect-[4/3] lg:aspect-auto lg:min-h-[340px]">
           <div className="absolute top-3 left-3 flex gap-1 rounded-full p-1 z-10 bg-black/50 border hair backdrop-blur-md">
@@ -482,12 +558,12 @@ export function TwinPanel() {
 
 const EQUIP = [
   ['CH-01', 'Chiller — centrifugal', 'Aquatic Centre', 'Mechanical', 2009, 5, '$184,000'],
-  ['L1', 'Passenger lift', 'Civic Centre', 'Vertical transport', 2004, 3, '$212,000'],
+  ['L1', 'Passenger lift', 'Council Chambers', 'Vertical transport', 2004, 3, '$212,000'],
   ['MSB', 'Main switchboard', 'Works Depot', 'Electrical', 1998, 3, '$96,000'],
-  ['AHU-03', 'Air handling unit', 'Central Library', 'Mechanical', 2015, 2, '$64,500'],
+  ['AHU-03', 'Air handling unit', 'Library & Gallery', 'Mechanical', 2015, 2, '$64,500'],
   ['FIP-01', 'Fire indicator panel', 'Childcare Centre', 'Fire services', 2019, 1, '$18,200'],
-  ['HWS-02', 'Hot water plant', 'Leisure Centre', 'Hydraulics', 2011, 3, '$41,000'],
-  ['RF-B', 'Roof membrane Zone B', 'Eastside Hall', 'Envelope', 1996, 4, '$128,000'],
+  ['HWS-02', 'Hot water plant', 'Sports Complex', 'Hydraulics', 2011, 3, '$41,000'],
+  ['RF-B', 'Roof membrane Zone B', 'Community Hall', 'Envelope', 1996, 4, '$128,000'],
 ];
 const DISC = ['All', 'Mechanical', 'Electrical', 'Hydraulics', 'Envelope'];
 
@@ -590,7 +666,7 @@ export function SensorsPanel() {
                 <span className="mono text-[11px] dim">{s.unit}</span>
               </div>
               <div className="mt-3">
-                <Sparkline data={series[k]} h={40} stroke={hot ? '#ff5f5f' : '#ededef'} />
+                <Sparkline data={series[k]} h={40} stroke={hot ? '#ff4545' : '#ededef'} />
               </div>
               <div className="mono text-[10px] dim mt-2">{s.src}</div>
             </div>

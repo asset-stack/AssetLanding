@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowRight, Check } from 'lucide-react';
-import { BUILDINGS, COND, CondBadge, Kpi, Screen, fmtK, fmtM } from './kit';
+import { BUILDINGS, COND, CondBadge, Kpi, Num, Screen, fmtK, fmtM } from './kit';
 
 // ─── Maintenance ───────────────────────────────────────────────────────────
 
@@ -8,15 +8,15 @@ const WO_COLS = [
   {
     k: 'Open',
     items: [
-      ['WO-4821', 'Roof membrane — Zone B make-safe', 'Eastside Hall', 4, 'Reactive'],
-      ['WO-4819', 'Lift L1 door sensor fault', 'Civic Centre', 3, 'Reactive'],
+      ['WO-4821', 'Roof membrane — Zone B make-safe', 'Community Hall', 4, 'Reactive'],
+      ['WO-4819', 'Lift L1 door sensor fault', 'Council Chambers', 3, 'Reactive'],
     ],
   },
   {
     k: 'Scheduled',
     items: [
       ['PM-2210', 'Chiller CH-01 vibration analysis', 'Aquatic Centre', 5, 'Predictive'],
-      ['PM-2204', 'Quarterly AHU filter change', 'Central Library', 2, 'Planned'],
+      ['PM-2204', 'Quarterly AHU filter change', 'Library & Gallery', 2, 'Planned'],
       ['PM-2198', 'Annual fire panel test', 'Childcare Centre', 1, 'Compliance'],
     ],
   },
@@ -86,18 +86,17 @@ export function MaintenancePanel() {
 
 // ─── Predictions ───────────────────────────────────────────────────────────
 
-const DRIVERS = [
-  ['Vibration trend', 41],
-  ['Run hours since overhaul', 22],
-  ['Asset age vs. useful life', 18],
-  ['Ambient load', 11],
-  ['Work-order history', 8],
+const FAILURE_MODES = [
+  ['Bearing wear', 62],
+  ['Seal leakage', 21],
+  ['Impeller cavitation', 11],
+  ['Motor winding fault', 6],
 ];
 const AT_RISK = [
-  ['Chiller CH-01', 'Aquatic Centre', 0.78, '47 d'],
-  ['Roof membrane B', 'Eastside Hall', 0.64, '4 mo'],
-  ['Lift L1 drive', 'Civic Centre', 0.41, '7 mo'],
-  ['Pump P-02', 'Aquatic Centre', 0.27, '11 mo'],
+  ['Pool Circulation Pump 2', 'Aquatic Centre', 0.58, '47 d'],
+  ['Chiller CH-01', 'Aquatic Centre', 0.49, '3 mo'],
+  ['Roof membrane B', 'Community Hall', 0.64, '4 mo'],
+  ['Lift L1 drive', 'Council Chambers', 0.41, '7 mo'],
 ];
 
 export function PredictionsPanel() {
@@ -126,73 +125,80 @@ export function PredictionsPanel() {
   const fx = x(failIdx + hist.length - 1);
 
   return (
-    <Screen title="Predictions — Chiller CH-01" meta="Ensemble model · retrained weekly">
+    <Screen title="Predictive analytics" meta="Pool Circulation Pump 2 · centrifugal pump · Aquatic Centre · Plant Room">
       <div className="grid gap-2.5">
         <div className="tile p-4">
-          <div className="flex items-end justify-between">
-            <div>
-              <div className="eyebrow !text-[10px]">Remaining useful life</div>
-              <div className="mt-1.5 text-[40px] font-light leading-none tracking-[-0.04em]">
-                47<span className="text-[16px] mute ml-1.5 tracking-normal">days</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              ['Days RUL', '47', null],
+              ['Failure risk', '58%', 'var(--bx-orange)'],
+              ['Operating hours', '31,240', null],
+              ['Anomaly score', '74.2/100', null],
+            ].map(([k, v, c]) => (
+              <div key={k}>
+                <div className="text-[11.5px] mute">{k}</div>
+                <div className="mt-1.5 text-[30px] font-light leading-none tracking-[-0.03em]" style={{ color: c || undefined }}>
+                  <Num v={v} />
+                </div>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="eyebrow !text-[10px]">Failure probability · 90 d</div>
-              <div className="mt-1.5 text-[24px] font-light leading-none" style={{ color: 'var(--bx-c4)' }}>
-                78%
-              </div>
-            </div>
+            ))}
           </div>
           <svg viewBox={`0 0 ${W} ${H + 18}`} className="w-full mt-4 overflow-visible">
             {[40, 60, 80].map((g) => (
               <line key={g} x1="0" x2={W} y1={y(g)} y2={y(g)} stroke="#fff" strokeOpacity="0.05" />
             ))}
-            <line x1="0" x2={W} y1={y(thr)} y2={y(thr)} stroke="#ff5f5f" strokeOpacity="0.5" strokeDasharray="3 4" />
-            <text x={W} y={y(thr) - 6} textAnchor="end" fill="#ff5f5f" fillOpacity="0.8" fontSize="10" fontFamily="JetBrains Mono, monospace">
+            <line x1="0" x2={W} y1={y(thr)} y2={y(thr)} stroke="#ff4545" strokeOpacity="0.5" strokeDasharray="3 4" />
+            <text x={W} y={y(thr) - 6} textAnchor="end" fill="#ff4545" fillOpacity="0.8" fontSize="10" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
               failure threshold
             </text>
-            <path d={band} fill="#4a5dff" fillOpacity="0.14" />
+            <path d={band} fill="#f08a3c" fillOpacity="0.14" />
             <path d={histD} fill="none" stroke="#ededef" strokeWidth="1.5" />
-            <path d={fcD} fill="none" stroke="#9aa3ff" strokeWidth="1.5" strokeDasharray="4 4" />
+            <path d={fcD} fill="none" stroke="#bdbdbd" strokeWidth="1.5" strokeDasharray="4 4" />
             <line x1={x(hist.length - 1)} x2={x(hist.length - 1)} y1="0" y2={H} stroke="#fff" strokeOpacity="0.15" />
-            <text x={x(hist.length - 1) + 6} y="12" fill="#8b8b94" fontSize="10" fontFamily="JetBrains Mono, monospace">
+            <text x={x(hist.length - 1) + 6} y="12" fill="#8b8b94" fontSize="10" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
               today
             </text>
             {failIdx > 0 && (
               <g transform={`translate(${fx} ${y(thr)})`}>
-                <circle r="4" fill="#ff5f5f" />
-                <circle r="4" fill="none" stroke="#ff5f5f">
+                <circle r="4" fill="#ff4545" />
+                <circle r="4" fill="none" stroke="#ff4545">
                   <animate attributeName="r" values="4;14" dur="2.2s" repeatCount="indefinite" />
                   <animate attributeName="stroke-opacity" values="0.8;0" dur="2.2s" repeatCount="indefinite" />
                 </circle>
               </g>
             )}
-            <text x="0" y={H + 16} fill="#5a5a63" fontSize="10" fontFamily="JetBrains Mono, monospace">
+            <text x="0" y={H + 16} fill="#5a5a63" fontSize="10" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
               −90 d
             </text>
-            <text x={W} y={H + 16} textAnchor="end" fill="#5a5a63" fontSize="10" fontFamily="JetBrains Mono, monospace">
+            <text x={W} y={H + 16} textAnchor="end" fill="#5a5a63" fontSize="10" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
               +60 d
             </text>
           </svg>
         </div>
         <div className="grid sm:grid-cols-2 gap-2.5">
           <div className="tile p-4">
-            <div className="eyebrow !text-[10px] mb-3">Contributing signals</div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11.5px] mute">Likely failure modes</span>
+              <span className="chip !text-[var(--bx-orange)] !border-[rgba(240,138,60,.35)]">High risk</span>
+            </div>
             <div className="space-y-2.5">
-              {DRIVERS.map(([k, v]) => (
+              {FAILURE_MODES.map(([k, v], i) => (
                 <div key={k} className="text-[12px]">
                   <div className="flex justify-between">
-                    <span className="mute">{k}</span>
-                    <span className="mono text-[10.5px]">{v}%</span>
+                    <span className={i ? 'mute' : ''}>{k}</span>
+                    <span className="tabular-nums">{v}%</span>
                   </div>
                   <div className="h-[2px] mt-1.5 bg-white/[0.06] rounded-full">
-                    <div className="h-full rounded-full bg-white/80" style={{ width: `${v * 2}%` }} />
+                    <div className="h-full rounded-full" style={{ width: `${v}%`, background: i ? 'rgba(236,236,236,.55)' : 'var(--bx-orange)' }} />
                   </div>
                 </div>
               ))}
             </div>
+            <div className="mt-4 pt-3 border-t hair text-[11.5px] mute">
+              RUL 90% confidence interval · <span className="text-white">29 – 58 days</span>
+            </div>
           </div>
-          <div className="tile p-4 flex-1">
+          <div className="tile p-4">
             <div className="eyebrow !text-[10px] mb-2">Portfolio watchlist</div>
             <ul className="text-[12px] divide-y divide-white/[0.06]">
               {AT_RISK.map(([n, s, p, t]) => (
@@ -242,7 +248,7 @@ export function AnalyticsPanel() {
           <span className="eyebrow !text-[10px]">Risk intensity · building × month</span>
           <span className="flex items-center gap-2 mono text-[10px] dim">
             low
-            <span className="w-20 h-[6px] rounded-full" style={{ background: 'linear-gradient(90deg, rgba(237,237,239,.06), rgba(74,93,255,.5), rgba(255,95,95,.7))' }} />
+            <span className="w-20 h-[6px] rounded-full" style={{ background: 'linear-gradient(90deg, rgba(237,237,239,.06), rgba(240,138,60,.5), rgba(255,95,95,.7))' }} />
             high
           </span>
         </div>
@@ -256,7 +262,7 @@ export function AnalyticsPanel() {
                   className="h-[18px] rounded-[3px]"
                   style={{
                     background:
-                      v > 0.7 ? `rgba(255,95,95,${0.3 + (v - 0.7) * 1.4})` : v > 0.35 ? `rgba(74,93,255,${0.12 + (v - 0.35) * 0.9})` : `rgba(237,237,239,${0.03 + v * 0.15})`,
+                      v > 0.7 ? `rgba(255,95,95,${0.3 + (v - 0.7) * 1.4})` : v > 0.35 ? `rgba(240,138,60,${0.12 + (v - 0.35) * 0.9})` : `rgba(237,237,239,${0.03 + v * 0.15})`,
                   }}
                   title={`${BUILDINGS[r].name} · ${Math.round(v * 100)}`}
                 />
@@ -303,7 +309,7 @@ export function CascadePanel() {
   const active = (n) => n.id === 'a' || (n.x <= 260 ? deferred >= 6 : deferred >= 15);
   const cost = CASCADE.filter(active).reduce((a, n) => a + n.cost, 0) * 1000;
   return (
-    <Screen title="Defect cascade" meta="Roof membrane — Eastside Hall">
+    <Screen title="Defect cascade" meta="Roof membrane — Community Hall">
       <div className="tile p-4 overflow-x-auto">
         <svg viewBox="0 0 560 300" className="w-full min-w-[480px]">
           {EDGES.map(([f, t]) => {
@@ -327,10 +333,10 @@ export function CascadePanel() {
               <g key={n.id} transform={`translate(${n.x - 8} ${n.y - 22})`} opacity={on ? 1 : 0.3} style={{ transition: 'opacity .5s' }}>
                 <rect width="104" height="44" rx="10" fill="rgba(255,255,255,0.04)" stroke="#fff" strokeOpacity={on ? 0.2 : 0.08} />
                 <circle cx="12" cy="15" r="3.5" fill={COND[n.c].color} />
-                <text x="22" y="19" fill="#ededef" fontSize="10.5" fontFamily="Inter Tight, sans-serif">
+                <text x="22" y="19" fill="#ededef" fontSize="10.5" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
                   {n.t.length > 15 ? `${n.t.slice(0, 14)}…` : n.t}
                 </text>
-                <text x="12" y="34" fill="#8b8b94" fontSize="9" fontFamily="JetBrains Mono, monospace">
+                <text x="12" y="34" fill="#8b8b94" fontSize="9" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
                   {n.s.length > 18 ? `${n.s.slice(0, 17)}…` : n.s}
                 </text>
               </g>
@@ -418,7 +424,7 @@ export function CapitalPanel() {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-2.5 mt-2.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mt-2.5">
         <Kpi label="Residual risk" value={o.risk} tone={o.risk > 60 ? 'var(--bx-c5)' : 'var(--bx-signal)'} delta={o.risk > 60 ? 'high' : 'low'} />
         <Kpi label="Life extension" value={o.life} />
         <Kpi label="vs. defer" value={o.k === 'Defer' ? '—' : `−${fmtK(OPTIONS[0].wolc - o.wolc)}`} />
@@ -434,17 +440,17 @@ export function CapitalPanel() {
 
 const PROJECTS = [
   ['Chiller CH-01 replacement', 'Aquatic Centre', 184, 24],
-  ['Roof membrane Zone B', 'Eastside Hall', 128, 18],
+  ['Roof membrane Zone B', 'Community Hall', 128, 18],
   ['Main switchboard upgrade', 'Works Depot', 96, 12],
-  ['Lift L1 modernisation', 'Civic Centre', 212, 14],
+  ['Lift L1 modernisation', 'Council Chambers', 212, 14],
   ['Fire panel upgrades ×4', 'Various', 86, 11],
   ['Pool filtration P-02', 'Aquatic Centre', 58, 6],
-  ['AHU-03 coil renewal', 'Central Library', 64, 5],
-  ['Hot water plant HWS-02', 'Leisure Centre', 41, 5],
-  ['Façade re-seal', 'Civic Centre', 310, 9],
-  ['Accessible amenities', 'Eastside Hall', 140, 7],
+  ['AHU-03 coil renewal', 'Library & Gallery', 64, 5],
+  ['Hot water plant HWS-02', 'Sports Complex', 41, 5],
+  ['Façade re-seal', 'Council Chambers', 310, 9],
+  ['Accessible amenities', 'Community Hall', 140, 7],
   ['Carpark lighting LED', 'Works Depot', 72, 3],
-  ['Solar + BMS integration', 'Leisure Centre', 420, 8],
+  ['Solar + BMS integration', 'Sports Complex', 420, 8],
 ];
 const TOTAL_RISK = PROJECTS.reduce((a, p) => a + p[3], 0);
 const TOTAL_COST = PROJECTS.reduce((a, p) => a + p[2], 0);
@@ -523,9 +529,9 @@ export function FundingPanel() {
                   const mx = (cap / TOTAL_COST) * 200;
                   return (
                     <>
-                      <path d={`${d} L200,80 L0,80 Z`} fill="#4a5dff" fillOpacity="0.12" />
+                      <path d={`${d} L200,80 L0,80 Z`} fill="#f08a3c" fillOpacity="0.12" />
                       <path d={d} fill="none" stroke="#ededef" strokeWidth="1.25" vectorEffect="non-scaling-stroke" />
-                      <line x1={mx} x2={mx} y1="0" y2="80" stroke="#c8f25a" strokeOpacity="0.8" vectorEffect="non-scaling-stroke" />
+                      <line x1={mx} x2={mx} y1="0" y2="80" stroke="#f08a3c" strokeOpacity="0.8" vectorEffect="non-scaling-stroke" />
                     </>
                   );
                 })()}
