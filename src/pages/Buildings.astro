@@ -1,0 +1,13 @@
+---
+import Base from '@/layouts/Base.astro';
+import Page from '@/components/pages_Buildings.jsx';
+import '@/styles/buildings.css';
+---
+
+<Base
+  title={`Buildings & Facilities | AssetStack`}
+  description={`Condition assessment, 20-year forward works programs, digital twins, predictive maintenance and capital optimisation for building and facility portfolios.`}
+  path="/Buildings"
+>
+  <Page client:load />
+</Base>

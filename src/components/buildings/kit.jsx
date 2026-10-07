@@ -79,7 +79,7 @@ export function Kpi({ label, value, delta, tone, className = '' }) {
   return (
     <div className={`tile p-3.5 ${className}`}>
       <div className="eyebrow !text-[10px]">{label}</div>
-      <div className="mt-2 flex items-baseline gap-2">
+      <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
         <span className="text-[26px] font-light tracking-[-0.03em] leading-none">{value}</span>
         {delta && (
           <span className="mono text-[10.5px]" style={{ color: tone || 'var(--bx-mute)' }}>
@@ -136,7 +136,7 @@ export function Sparkline({ data, w = 120, h = 32, stroke = '#ededef', fill = tr
 }
 
 // ─── Dark city map ─────────────────────────────────────────────────────────
-// Procedural street grid in the style of a muted vector basemap.
+// Graded satellite base with a faint vector street overlay and condition pins.
 
 const MAP_W = 800;
 const MAP_H = 500;
@@ -164,31 +164,29 @@ const STREETS = buildStreets();
 export function CityMap({ selected, onSelect, compact = false, className = '' }) {
   return (
     <div className={`relative overflow-hidden rounded-[14px] border hair bg-[#09090b] ${className}`}>
-      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="block w-full h-full" preserveAspectRatio="xMidYMid slice">
+      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="absolute inset-0 block w-full h-full" preserveAspectRatio="xMidYMid slice">
         <defs>
           <radialGradient id="mapVignette" cx="50%" cy="45%" r="70%">
             <stop offset="0.55" stopColor="#09090b" stopOpacity="0" />
             <stop offset="1" stopColor="#050506" stopOpacity="0.95" />
           </radialGradient>
-          <pattern id="mapPark" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
-            <line x1="0" y1="0" x2="0" y2="6" stroke="#ffffff" strokeOpacity="0.05" />
-          </pattern>
         </defs>
-        {/* water */}
-        <path
-          d={`M0,${MAP_H} L0,430 C90,410 140,470 230,455 C330,440 360,${MAP_H - 10} 470,${MAP_H} Z`}
-          fill="#0f1220"
+        {/* satellite base, graded down to sit behind the data */}
+        <image
+          href="/media/buildings/map-topdown-town.webp"
+          x="-40"
+          y="-20"
+          width={MAP_W + 80}
+          height={MAP_H + 40}
+          preserveAspectRatio="xMidYMid slice"
+          style={{ filter: 'grayscale(0.55) brightness(0.5) contrast(1.15)' }}
         />
-        <path d="M800,0 L800,90 C740,70 720,30 700,0 Z" fill="#0f1220" />
-        {/* parks */}
-        <path d="M120,60 L230,40 L250,120 L140,140 Z" fill="url(#mapPark)" stroke="#fff" strokeOpacity="0.04" />
-        <path d="M560,300 L680,290 L700,370 L590,390 Z" fill="url(#mapPark)" stroke="#fff" strokeOpacity="0.04" />
-        <g stroke="#ffffff" strokeOpacity="0.055" strokeWidth="1" fill="none">
+        <g stroke="#ffffff" strokeOpacity="0.035" strokeWidth="1" fill="none">
           {STREETS.minor.map((d, i) => (
             <path key={i} d={d} />
           ))}
         </g>
-        <g stroke="#ffffff" strokeOpacity="0.14" strokeWidth="2.2" fill="none">
+        <g stroke="#ffffff" strokeOpacity="0.1" strokeWidth="1.5" fill="none">
           {STREETS.major.map((d, i) => (
             <path key={i} d={d} />
           ))}
@@ -233,7 +231,7 @@ export function CityMap({ selected, onSelect, compact = false, className = '' })
           );
         })}
       </svg>
-      <div className="absolute left-3 bottom-3 flex items-center gap-3 glass glass-pill px-3 py-1.5">
+      <div className="absolute left-3 bottom-3 flex items-center gap-3 rounded-full px-3 py-1.5 bg-black/50 border hair backdrop-blur-md">
         {[1, 2, 3, 4, 5].map((c) => (
           <span key={c} className="inline-flex items-center gap-1 mono text-[10px] mute">
             <CondDot c={c} /> C{c}

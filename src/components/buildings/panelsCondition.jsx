@@ -18,7 +18,7 @@ export function DashboardPanel() {
         <Kpi label="20-yr FWP" value={PORTFOLIO.fwp} delta="indexed" />
       </div>
       <div className="mt-2.5 grid lg:grid-cols-[1.6fr_1fr] gap-2.5">
-        <CityMap selected={sel} onSelect={setSel} compact className="aspect-[16/10]" />
+        <CityMap selected={sel} onSelect={setSel} compact className="aspect-[16/10] lg:aspect-auto lg:min-h-[340px]" />
         <div className="flex flex-col gap-2.5">
           <div className="tile p-4">
             <div className="flex items-center justify-between">
@@ -233,6 +233,7 @@ export function FwpPanel() {
 const TREE = {
   name: 'Sample council portfolio',
   meta: '48 sites',
+  open: true,
   children: [
     {
       name: 'Aquatic Centre',
@@ -395,7 +396,7 @@ export function TwinPanel() {
     <Screen title="Digital twin — Aquatic Centre" meta="3D · plan · linked findings">
       <div className="grid lg:grid-cols-[1.5fr_1fr] gap-2.5">
         <div className="tile relative overflow-hidden aspect-[4/3] lg:aspect-auto lg:min-h-[340px]">
-          <div className="absolute top-3 left-3 flex gap-1 glass glass-pill p-1 z-10">
+          <div className="absolute top-3 left-3 flex gap-1 rounded-full p-1 z-10 bg-black/50 border hair backdrop-blur-md">
             {LEVELS.map((l) => (
               <button
                 key={l}
