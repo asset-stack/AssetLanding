@@ -45,7 +45,7 @@ export function DashboardPanel() {
             <div className="mt-4 flex items-end justify-between">
               <div>
                 <div className="text-[11px] dim">Risk score</div>
-                <div className="text-[30px] font-light leading-none mt-1 tracking-[-0.03em]">{b.risk}</div>
+                <div className="fig text-[30px] leading-none mt-1">{b.risk}</div>
               </div>
               <div className="w-1/2">
                 <NoisyChart seed={b.risk} n={60} h={40} axis={false} band={[0.7, 0.82]} />
@@ -213,7 +213,7 @@ export function FwpPanel() {
               key={p}
               type="button"
               onClick={() => setProg(p)}
-              className={`px-3 py-1 rounded-full text-[12px] transition-colors ${prog === p ? 'bg-[#d9d9d9] text-black' : 'mute hover:text-white'}`}
+              className={`px-3 py-1 rounded-full text-[12px] transition-colors ${prog === p ? 'bg-[var(--bx-blue)] text-white' : 'mute hover:text-white'}`}
             >
               {p}
             </button>
@@ -373,7 +373,7 @@ export function AssetTreePanel() {
             {loc.rooms.map((r, i) => (
               <g key={r} transform={`translate(${rx(i)} 258)`} onClick={() => setRi(i)} style={{ cursor: 'pointer' }}>
                 <circle r="18" fill="transparent" />
-                <rect x="-8" y="-8" width="16" height="16" rx="5" fill={i === ri ? '#f08a3c' : '#1b1b1b'} stroke="#fff" strokeOpacity={i === ri ? 0 : 0.3} />
+                <rect x="-8" y="-8" width="16" height="16" rx="5" fill={i === ri ? '#1232f6' : '#1b1b1b'} stroke="#fff" strokeOpacity={i === ri ? 0 : 0.3} />
                 <text y="26" textAnchor="middle" fill="#ececec" fillOpacity={i === ri ? 1 : 0.5} fontSize="10" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
                   {r}
                 </text>
@@ -482,7 +482,7 @@ export function TwinPanel() {
                   setHs(0);
                 }}
                 className={`px-3 py-1 rounded-full text-[11.5px] transition-colors ${
-                  lvl === l ? 'bg-white text-black' : 'mute hover:text-white'
+                  lvl === l ? 'bg-[var(--bx-blue)] text-white' : 'mute hover:text-white'
                 }`}
               >
                 {l}
@@ -578,7 +578,7 @@ export function EquipmentPanel() {
             key={d}
             type="button"
             onClick={() => setF(d)}
-            className={`chip transition-colors ${f === d ? '!bg-white !text-black !border-white' : 'hover:!text-white'}`}
+            className={`chip transition-colors ${f === d ? '!bg-[var(--bx-blue)] !text-white !border-[var(--bx-blue)]' : 'hover:!text-white'}`}
           >
             {d}
           </button>
@@ -642,7 +642,7 @@ export function SensorsPanel() {
     }),
   );
   return (
-    <Screen title="Sensors" meta="MQTT · BACnet · REST · CSV — 312 streams">
+    <Screen title="Sensors" meta="MQTT · REST · CSV — 312 streams">
       <div className="grid sm:grid-cols-2 gap-2.5">
         {SIGNALS.map((s, k) => {
           const v = series[k][series[k].length - 1];
@@ -660,7 +660,7 @@ export function SensorsPanel() {
                 </span>
               </div>
               <div className="mt-2 flex items-baseline gap-1.5">
-                <span className="text-[28px] font-light tracking-[-0.03em] leading-none tabular-nums">
+                <span className="fig text-[28px] leading-none">
                   {v.toFixed(s.base > 100 ? 0 : 1)}
                 </span>
                 <span className="mono text-[11px] dim">{s.unit}</span>

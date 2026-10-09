@@ -30,7 +30,7 @@ session scratchpad and export its bin/ onto PATH (ask the user first).
 | Page titles / meta descriptions / canonicals | `src/pages/*.astro` (never client-side) |
 | Landing sections (FAQ, pricing copy, personas, ROI calc…) | `src/components/landing/<Section>.jsx` |
 | Per-page content (Product, About, Customers…) | `src/components/pages_<Name>.jsx` |
-| Buildings & Facilities landing (`/Buildings`, black liquid-glass test page) | `src/components/pages_Buildings.jsx`, panels in `src/components/buildings/`, styles in `src/styles/buildings.css` (scoped under `.bx`) |
+| Buildings & Facilities landing (`/Buildings`, black liquid-glass test page) | `src/components/pages_Buildings.jsx`, panels in `src/components/buildings/`, styles in `src/styles/buildings.css` (scoped under `.bx`); share image `public/og-buildings.jpg` (JPEG on purpose — social previews), passed via the `ogImage` prop on `Base.astro` |
 | Images / video | `public/media/` — WebP only (max 1920px, q82); convert with `sharp` before adding |
 | Cookie/consent banner + analytics IDs | `src/components/Consent.astro` |
 | robots / sitemap | `public/robots.txt`, `public/sitemap.xml` — add new pages to the sitemap |

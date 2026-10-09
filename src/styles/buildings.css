@@ -2,10 +2,12 @@
    Black, minimal, liquid-glass. Everything is scoped under .bx so the rest
    of the (light) marketing site is untouched. */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300;400;500&display=swap');
+/* Brand type: Inter Tight (300/400/500/700) + JetBrains Mono for figures. */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
 .bx {
-  /* VEXTO-style: charcoal, white type, one "attention orange" accent */
+  /* VEXTO-style charcoal surfaces in AssetStack brand colour. Signal Blue is
+     the interface accent; grading colours (green → red) stay on the data. */
   --bx-bg: #0c0c0c;
   --bx-surface: #151515;
   --bx-surface-2: #1b1b1b;
@@ -19,7 +21,9 @@
   --bx-ok: #5fd27a;
   --bx-alert: #ff4545;
   --bx-signal: var(--bx-ok);
-  --bx-blue: var(--bx-orange);
+  --bx-blue: #1232f6; /* Signal Blue */
+  --bx-deep: #0000d3; /* Deep Stack */
+  --bx-blue-ink: #7d8cff; /* Signal Blue tint for small text on charcoal */
   /* condition scale 1 Excellent → 5 Very poor: quiet greys until it matters */
   --bx-c1: #8fd6a0;
   --bx-c2: #c9cec9;
@@ -29,22 +33,24 @@
 
   background: var(--bx-bg);
   color: var(--bx-ink);
-  font-family: 'Helvetica Neue', 'Inter Tight', Helvetica, Arial, sans-serif;
+  font-family: 'Inter Tight', Georgia, 'Times New Roman', serif;
   font-feature-settings: 'tnum';
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
-.bx ::selection { background: rgba(240, 138, 60, 0.45); color: #fff; }
+.bx ::selection { background: rgba(18, 50, 246, 0.6); color: #fff; }
 
 /* small data labels: same family, tabular figures (VEXTO uses no monospace) */
-.bx .mono { font-variant-numeric: tabular-nums; letter-spacing: 0.005em; }
+.bx .mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+/* large figures */
+.bx .fig { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-weight: 300; letter-spacing: -0.06em; }
 .bx .mute { color: var(--bx-mute); }
 .bx .dim { color: var(--bx-dim); }
 .bx .hair { border-color: var(--bx-line); }
 
 .bx .display {
-  font-weight: 300;
-  letter-spacing: -0.035em;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   line-height: 1.02;
 }
 .bx .eyebrow {
@@ -125,8 +131,8 @@
   transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.25s;
   white-space: nowrap;
 }
-.bx .btn-light { background: #d9d9d9; color: #111; }
-.bx .btn-light:hover { background: #f0f0f0; }
+.bx .btn-light { background: var(--bx-blue); color: #fff; font-weight: 500; }
+.bx .btn-light:hover { background: #2b48ff; }
 .bx .btn-ghost {
   color: var(--bx-ink);
   background: rgba(255, 255, 255, 0.04);
@@ -213,7 +219,7 @@
 }
 .bx .feat:hover { color: var(--bx-mute); }
 .bx .feat[aria-selected='true'] { color: var(--bx-ink); }
-.bx .feat[aria-selected='true']::before { background: var(--bx-ink); }
+.bx .feat[aria-selected='true']::before { background: var(--bx-blue); width: 2px; }
 .bx .feat .feat-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.45s ease; }
 .bx .feat[aria-selected='true'] .feat-body { grid-template-rows: 1fr; }
 
@@ -232,9 +238,9 @@
 
 /* range input — Funding Optimiser */
 .bx input[type='range'] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; }
-.bx input[type='range']::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(90deg, var(--bx-orange) var(--p, 50%), rgba(255, 255, 255, 0.12) var(--p, 50%)); border-radius: 2px; }
+.bx input[type='range']::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(90deg, var(--bx-blue) var(--p, 50%), rgba(255, 255, 255, 0.12) var(--p, 50%)); border-radius: 2px; }
 .bx input[type='range']::-moz-range-track { height: 2px; background: rgba(255, 255, 255, 0.12); border-radius: 2px; }
-.bx input[type='range']::-moz-range-progress { height: 2px; background: var(--bx-orange); }
+.bx input[type='range']::-moz-range-progress { height: 2px; background: var(--bx-blue); }
 .bx input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -8px; border-radius: 999px; background: #f3f3f5; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08); cursor: grab; }
 .bx input[type='range']::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 999px; background: #f3f3f5; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08); cursor: grab; }
 
@@ -259,3 +265,9 @@
 #consent-accept { background: #d9d9d9 !important; color: #111 !important; border-radius: 999px !important; font-weight: 500 !important; }
 #consent-decline { border-color: rgba(255, 255, 255, 0.15) !important; color: #d9d9d9 !important; border-radius: 999px !important; font-weight: 500 !important; }
 #consent-decline:hover { background: rgba(255, 255, 255, 0.06) !important; }
+
+/* client logo marquee */
+@keyframes bx-marquee { to { transform: translateX(-50%); } }
+.bx .marquee { animation: bx-marquee 70s linear infinite; }
+.bx .marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .bx .marquee { animation: none; flex-wrap: wrap; width: auto; justify-content: center; } }

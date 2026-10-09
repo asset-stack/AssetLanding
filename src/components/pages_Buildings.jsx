@@ -19,6 +19,7 @@ import {
   CapitalPanel,
   FundingPanel,
 } from '@/components/buildings/panelsOps';
+import { Demo, Faq, FirstWeek, Trusted } from '@/components/buildings/sections';
 
 // AssetStack — Buildings & Facilities. A deliberately quiet, black,
 // liquid-glass take on the platform, used to test a different design cue
@@ -26,7 +27,6 @@ import {
 
 const M = '/media/buildings/';
 const HERO_IMG = `${M}map-aerial-angled.webp`;
-const CLOSE_IMG = `${M}map-topdown-estuary.webp`;
 const BAND_IMG = `${M}photo-park.webp`;
 
 const GROUPS = [
@@ -60,7 +60,7 @@ const GROUPS = [
       { k: 'Asset tree', d: 'Site → building → system → component. Drill to the smallest replaceable part and its history.', P: AssetTreePanel },
       { k: 'Digital twin', d: 'Walk the building remotely. Hotspots tie defects, sensors and findings to the exact location.', P: TwinPanel },
       { k: 'Equipment', d: 'A single register of plant and equipment — install year, condition and replacement value.', P: EquipmentPanel },
-      { k: 'Sensors', d: 'BMS, MQTT, BACnet or CSV. Live readings with threshold rules and anomaly alerts.', P: SensorsPanel },
+      { k: 'Sensors', d: 'MQTT, REST or CSV from any source. Live readings with threshold rules and anomaly alerts.', P: SensorsPanel },
     ],
   },
   {
@@ -123,9 +123,9 @@ function Nav() {
         }`}
       >
         <a href="/Buildings" className="flex items-center gap-2.5" aria-label="AssetStack — Buildings & Facilities">
-          <img src="/media/buildings/as-icon-white.webp" alt="" width="20" height="20" className="w-5 h-5" />
+          <img src="/media/buildings/as-symbol-colour.webp" alt="" width="20" height="20" className="w-5 h-5" />
           <img src="/media/buildings/as-wordmark-white.webp" alt="AssetStack" height="16" className="h-[15px] w-auto" />
-          <span className="hidden sm:inline mono text-[10.5px] dim ml-1.5 pl-3 border-l hair">Buildings &amp; Facilities</span>
+          <span className="hidden sm:inline text-[11.5px] dim ml-1.5 pl-3 border-l hair">Buildings &amp; Facilities</span>
         </a>
         <nav className="hidden lg:flex items-center gap-7 text-[13px] mute">
           {GROUPS.map((g) => (
@@ -140,7 +140,7 @@ function Nav() {
               Sign in
             </a>
           </span>
-          <a href="/Contact" className="btn btn-light !h-10 !px-4">
+          <a href="#demo" className="btn btn-light !h-10 !px-4">
             Book a demo
           </a>
           <span className="lg:hidden">
@@ -183,7 +183,7 @@ function HeroCards() {
           <ArrowUpRight className="w-4 h-4 mute" strokeWidth={1.5} />
         </div>
         <div className="mt-3 flex items-baseline gap-2">
-          <Num v="57.4" className="text-[44px] font-light tracking-[-0.04em] leading-none" />
+          <Num v="57.4" className="text-[44px] leading-none" />
           <span className="text-[11px] mute">% · today</span>
         </div>
         <NoisyChart seed={11} n={140} h={70} band={[0.66, 0.8]} className="mt-4" axis={false} />
@@ -197,14 +197,14 @@ function HeroCards() {
           <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--bx-ok)' }} strokeWidth={2} />
           <div className="mt-2 flex items-end justify-between">
             <span className="text-[13px] mute">Operational</span>
-            <span className="text-[24px] font-light leading-none tracking-[-0.02em]">3,965</span>
+            <span className="fig text-[24px] leading-none">3,965</span>
           </div>
         </Glass>
         <Glass className="glass-sm p-4">
           <AlertTriangle className="w-4 h-4" style={{ color: 'var(--bx-alert)' }} strokeWidth={2} />
           <div className="mt-2 flex items-end justify-between">
             <span className="text-[13px] mute">Critical</span>
-            <span className="text-[24px] font-light leading-none tracking-[-0.02em]">143</span>
+            <span className="fig text-[24px] leading-none">143</span>
           </div>
         </Glass>
       </div>
@@ -250,7 +250,7 @@ function Hero() {
           <div>
             <Reveal>
               <Eyebrow className="flex items-center gap-2">
-                <span className="dot pulse" style={{ background: 'var(--bx-orange)', color: 'var(--bx-orange)' }} />
+                <span className="dot pulse" style={{ background: 'var(--bx-blue)', color: 'var(--bx-blue)' }} />
                 AssetStack · Buildings &amp; Facilities
               </Eyebrow>
             </Reveal>
@@ -268,7 +268,7 @@ function Hero() {
               </p>
             </Reveal>
             <Reveal delay={240} className="mt-9 flex flex-wrap gap-2.5">
-              <a href="/Contact" className="btn btn-light">
+              <a href="#demo" className="btn btn-light">
                 Book a demo
               </a>
               <a href="#overview" className="btn btn-ghost">
@@ -325,7 +325,7 @@ function Context() {
               />
               <circle cx="210" cy="120" r="30" fill="none" stroke="#fff" strokeOpacity="0.25" strokeDasharray="2 4" />
               <circle cx="210" cy="120" r="9" fill="#ececec" />
-              <circle cx="120" cy="90" r="3" fill="#f08a3c" />
+              <circle cx="120" cy="90" r="4" fill="#1232f6" />
               <circle cx="350" cy="190" r="3" fill="#ececec" />
             </svg>
           </Reveal>
@@ -339,8 +339,8 @@ function Context() {
                   style={{ background: 'radial-gradient(80% 60% at 80% 0%, rgba(255,255,255,0.08), transparent 70%)' }}
                 />
                 <div className="relative flex items-start gap-1">
-                  <span className="text-[44px] font-extralight tracking-[-0.04em] text-white/25 leading-none">{n}</span>
-                  <span className="mt-1 w-[3px] h-[3px] rounded-full" style={{ background: 'var(--bx-orange)' }} />
+                  <span className="fig text-[44px] text-white/25 leading-none">{n}</span>
+                  <span className="mt-1 w-[5px] h-[5px] rounded-full" style={{ background: 'var(--bx-blue)' }} />
                 </div>
                 <p className="relative mt-8 text-[15px] leading-[1.55]">
                   {k} <span className="mute">{d}</span>
@@ -367,7 +367,7 @@ function Plate({ p }) {
         </div>
         <div className="text-[12px] mute mt-0.5">{p.sub}</div>
         <p className="mt-3 text-[12px] leading-[1.5] text-white/70">{p.body}</p>
-        <Num v={p.value} className="block mt-6 text-[46px] font-extralight tracking-[-0.04em] leading-none" />
+        <Num v={p.value} className="block mt-6 text-[46px] leading-none" />
       </Glass>
     </div>
   );
@@ -390,16 +390,16 @@ function Group({ g }) {
           <div className="flex flex-col">
             <Reveal>
               <h2 className="display text-[36px] sm:text-[48px]">
-                <span className="text-white/45">{g.title}</span>
+                <span className="text-white/70">{g.title}</span>
               </h2>
             </Reveal>
             <Reveal delay={80} className="mt-10">
               <div className="text-[13px] mute">{g.stat.label}</div>
-              <Num v={g.stat.value} className="block text-[64px] sm:text-[80px] font-extralight tracking-[-0.05em] leading-none mt-2" />
+              <Num v={g.stat.value} className="block text-[60px] sm:text-[76px] leading-none mt-2" />
               <div className="text-[13px] mute mt-2">{g.stat.caption}</div>
             </Reveal>
             <Reveal delay={140} className="mt-auto pt-10">
-              <span className="block w-10 h-px" style={{ background: 'var(--bx-orange)' }} />
+              <span className="block w-10 h-[2px]" style={{ background: 'var(--bx-blue)' }} />
               <p className="mt-5 text-[15px] leading-[1.65] mute max-w-[440px]">{g.intro}</p>
             </Reveal>
           </div>
@@ -493,7 +493,7 @@ function Band() {
           {stats.map(([k, d], i) => (
             <Reveal key={k} delay={i * 70}>
               <Glass className="p-6 h-full">
-                <div className="text-[32px] font-extralight tracking-[-0.03em]">{k}</div>
+                <div className="fig text-[30px]">{k}</div>
                 <div className="mt-3 text-[13px] leading-[1.55] text-white/65">{d}</div>
               </Glass>
             </Reveal>
@@ -504,54 +504,12 @@ function Band() {
   );
 }
 
-// ─── Closing ───────────────────────────────────────────────────────────────
-
-function Closing() {
-  return (
-    <section className="relative py-28 sm:py-40 overflow-hidden">
-      <img
-        src={CLOSE_IMG}
-        alt=""
-        loading="lazy"
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: 'saturate(0.5) brightness(0.38)' }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c0c] via-[#0c0c0c]/40 to-[#0c0c0c]" />
-      <div className="relative mx-auto max-w-[1180px] px-4 sm:px-6 text-center">
-        <Reveal>
-          <img src="/media/buildings/as-icon-white.webp" alt="" width="40" height="40" className="w-10 h-10 mx-auto opacity-90" />
-        </Reveal>
-        <Reveal delay={80}>
-          <h2 className="display text-[42px] sm:text-[68px] mt-8">
-            <span className="text-white/45">See your buildings</span>
-            <br />
-            the way we do.
-          </h2>
-        </Reveal>
-        <Reveal delay={160}>
-          <p className="mt-6 text-[15px] mute max-w-[460px] mx-auto leading-[1.65]">
-            Bring a register, a condition report or a single building. We’ll show you its 20-year program in the first session.
-          </p>
-        </Reveal>
-        <Reveal delay={240} className="mt-10 flex flex-wrap justify-center gap-2.5">
-          <a href="/Contact" className="btn btn-light">
-            Book a demo
-          </a>
-          <a href="/Product" className="btn btn-ghost">
-            Full platform <ArrowUpRight className="w-4 h-4" />
-          </a>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 function Footer() {
   return (
     <footer className="border-t hair">
       <div className="mx-auto max-w-[1180px] px-4 sm:px-6 py-10 flex flex-col sm:flex-row gap-6 sm:items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <img src="/media/buildings/as-icon-white.webp" alt="" width="16" height="16" className="w-4 h-4" />
+          <img src="/media/buildings/as-symbol-colour.webp" alt="" width="16" height="16" className="w-4 h-4" />
           <img src="/media/buildings/as-wordmark-white.webp" alt="AssetStack" className="h-3 w-auto" />
           <span className="mono text-[10.5px] dim ml-2">© {new Date().getFullYear()}</span>
         </div>
@@ -562,7 +520,7 @@ function Footer() {
           <a href="/Contact" className="hover:text-white">Contact</a>
         </nav>
       </div>
-      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 pb-10 mono text-[10.5px] dim">
+      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 pb-10 text-[11.5px] dim">
         Platform views show an illustrative sample portfolio.
       </div>
     </footer>
@@ -575,12 +533,15 @@ export default function Buildings() {
       <Nav />
       <main>
         <Hero />
+        <Trusted />
         <Context />
         {GROUPS.map((g) => (
           <Group key={g.id} g={g} />
         ))}
+        <FirstWeek />
         <Band />
-        <Closing />
+        <Faq />
+        <Demo />
       </main>
       <Footer />
     </div>

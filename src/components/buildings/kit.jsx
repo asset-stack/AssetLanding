@@ -85,9 +85,9 @@ export function CondBadge({ c }) {
 export function Num({ v, className = '' }) {
   const str = String(v);
   const m = str.match(/^([^.\d]*[\d,]+)(\.\d+)?(.*)$/);
-  if (!m) return <span className={className}>{str}</span>;
+  if (!m) return <span className={`fig ${className}`}>{str}</span>;
   return (
-    <span className={className}>
+    <span className={`fig ${className}`}>
       {m[1]}
       {m[2] && <span className="text-white/40">{m[2]}</span>}
       {m[3] && <span className="text-white/40 text-[0.55em] ml-0.5 tracking-normal">{m[3]}</span>}
@@ -100,7 +100,7 @@ export function Kpi({ label, value, delta, tone, className = '' }) {
     <div className={`tile p-3.5 ${className}`}>
       <div className="text-[11.5px] mute">{label}</div>
       <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-        <Num v={value} className="text-[26px] font-light tracking-[-0.03em] leading-none" />
+        <Num v={value} className="text-[26px] leading-none" />
         {delta && (
           <span className="text-[10.5px]" style={{ color: tone || 'var(--bx-mute)' }}>
             {delta}

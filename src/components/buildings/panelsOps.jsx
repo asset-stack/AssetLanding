@@ -137,7 +137,7 @@ export function PredictionsPanel() {
             ].map(([k, v, c]) => (
               <div key={k}>
                 <div className="text-[11.5px] mute">{k}</div>
-                <div className="mt-1.5 text-[30px] font-light leading-none tracking-[-0.03em]" style={{ color: c || undefined }}>
+                <div className="mt-1.5 text-[30px] leading-none" style={{ color: c || undefined }}>
                   <Num v={v} />
                 </div>
               </div>
@@ -368,7 +368,7 @@ export function CascadePanel() {
         </div>
         <div className="tile p-4">
           <div className="eyebrow !text-[10px]">Total exposure</div>
-          <div className="mt-2 text-[30px] font-light leading-none tracking-[-0.03em]">{fmtK(cost)}</div>
+          <div className="fig mt-2 text-[30px] leading-none">{fmtK(cost)}</div>
           <div className="mono text-[10.5px] mute mt-1.5">vs. $18k to repair today</div>
         </div>
       </div>
@@ -491,7 +491,7 @@ export function FundingPanel() {
           <div className="tile p-4">
             <div className="flex items-center justify-between">
               <span className="eyebrow !text-[10px]">Budget cap</span>
-              <span className="text-[22px] font-light tracking-[-0.03em]">{fmtM(cap * 1000)}</span>
+              <span className="fig text-[22px]">{fmtM(cap * 1000)}</span>
             </div>
             <input
               type="range"
@@ -531,7 +531,7 @@ export function FundingPanel() {
                     <>
                       <path d={`${d} L200,80 L0,80 Z`} fill="#f08a3c" fillOpacity="0.12" />
                       <path d={d} fill="none" stroke="#ededef" strokeWidth="1.25" vectorEffect="non-scaling-stroke" />
-                      <line x1={mx} x2={mx} y1="0" y2="80" stroke="#f08a3c" strokeOpacity="0.8" vectorEffect="non-scaling-stroke" />
+                      <line x1={mx} x2={mx} y1="0" y2="80" stroke="#1232f6" strokeOpacity="1" strokeWidth="2" vectorEffect="non-scaling-stroke" />
                     </>
                   );
                 })()}
@@ -554,7 +554,7 @@ export function FundingPanel() {
                 >
                   <span
                     className={`w-4 h-4 rounded-[5px] flex items-center justify-center flex-none transition-colors ${
-                      on ? 'bg-white text-black' : 'border border-white/15'
+                      on ? 'bg-[var(--bx-blue)] text-white' : 'border border-white/15'
                     }`}
                   >
                     {on && <Check className="w-3 h-3" strokeWidth={2.5} />}
