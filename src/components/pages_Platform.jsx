@@ -270,8 +270,8 @@ function Hero() {
               </Eyebrow>
             </Reveal>
             <Reveal delay={80}>
-              <h1 className="display text-[42px] sm:text-[60px] lg:text-[64px] xl:text-[70px] mt-6">
-                <span className="text-white/45">The intelligence layer</span>
+              <h1 className="display text-[42px] sm:text-[60px] lg:text-[60px] xl:text-[68px] mt-6">
+                <span className="text-white/45 lg:whitespace-nowrap">The intelligence layer</span>
                 <br />
                 for all your data.
               </h1>
