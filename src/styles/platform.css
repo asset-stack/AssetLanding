@@ -271,3 +271,8 @@
 .bx .marquee { animation: bx-marquee 70s linear infinite; }
 .bx .marquee:hover { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .bx .marquee { animation: none; flex-wrap: wrap; width: auto; justify-content: center; } }
+
+/* Hero cards pop in as the hero scroll plays */
+.bx .pop { opacity: 0; transform: translateY(26px) scale(0.94); filter: blur(6px); transition: opacity .6s ease, transform .7s cubic-bezier(.2,1.4,.4,1), filter .6s ease; }
+.bx .pop.in { opacity: 1; transform: none; filter: none; }
+@media (prefers-reduced-motion: reduce) { .bx .pop { opacity: 1; transform: none; filter: none; transition: none; } }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, ArrowRight, ArrowUpRight, CheckCircle2, ChevronUp, Menu, X } from 'lucide-react';
 import { PLATFORM_URL } from '@/config/site';
 import { Eyebrow, Glass, LensContext, NoisyChart, Num, Reveal, useLens, useSetLens } from '@/components/platform/kit';
@@ -14,6 +14,9 @@ import { Demo, Faq, FirstWeek, Trusted } from '@/components/platform/sections';
 
 const M = '/media/buildings/';
 const HERO_IMG = `${M}map-aerial-angled.webp`;
+// Drone flyover of the same aerial shot, scrubbed by scroll. Empty → the
+// still image stays as the hero background.
+const HERO_VIDEO = ''; // base path: .webm (VP9) first, .mp4 (H.264) fallback
 const BAND_IMG = `${M}photo-worker.webp`;
 
 const CHAPTERS = [
@@ -193,12 +196,23 @@ function Nav() {
 
 // ─── Hero ──────────────────────────────────────────────────────────────────
 
-function HeroCards() {
+// Scroll position (0 – 1) at which each hero card pops in.
+const POP = { health: 0.1, operational: 0.3, critical: 0.42, warning: 0.58 };
+
+function pop(on, delay = 0) {
+  return { className: `pop ${on ? 'in' : ''}`, style: { transitionDelay: on ? `${delay}ms` : '0ms' } };
+}
+
+function HeroCards({ p }) {
   const L = useLens();
   const C = L.heroCard;
+  const health = pop(p >= POP.health);
+  const op = pop(p >= POP.operational);
+  const crit = pop(p >= POP.critical);
+  const warn = pop(p >= POP.warning);
   return (
-    <div key={L.id} className="relative h-[460px] hidden md:block animate-in fade-in duration-500">
-      <Glass className="absolute right-0 top-0 w-[330px] p-5">
+    <div key={L.id} className="relative h-[460px] hidden md:block">
+      <Glass className={`absolute right-0 top-0 w-[330px] p-5 ${health.className}`} style={health.style}>
         <div className="flex items-start justify-between">
           <span className="text-[13px]">{C.healthLabel || 'Portfolio health'}</span>
           <ArrowUpRight className="w-4 h-4 mute" strokeWidth={1.5} />
@@ -214,14 +228,14 @@ function HeroCards() {
         </div>
       </Glass>
       <div className="absolute left-0 top-[200px] w-[190px] space-y-2.5">
-        <Glass className="glass-sm p-4">
+        <Glass className={`glass-sm p-4 ${op.className}`} style={op.style}>
           <CheckCircle2 className="w-4 h-4" style={{ color: 'var(--bx-ok)' }} strokeWidth={2} />
           <div className="mt-2 flex items-end justify-between">
             <span className="text-[13px] mute">Operational</span>
             <span className="fig text-[24px] leading-none">{C.operational}</span>
           </div>
         </Glass>
-        <Glass className="glass-sm p-4">
+        <Glass className={`glass-sm p-4 ${crit.className}`} style={crit.style}>
           <AlertTriangle className="w-4 h-4" style={{ color: 'var(--bx-alert)' }} strokeWidth={2} />
           <div className="mt-2 flex items-end justify-between">
             <span className="text-[13px] mute">Critical</span>
@@ -229,7 +243,7 @@ function HeroCards() {
           </div>
         </Glass>
       </div>
-      <Glass className="absolute right-0 bottom-0 w-[300px] p-4">
+      <Glass className={`absolute right-0 bottom-0 w-[300px] p-4 ${warn.className}`} style={warn.style}>
         <div className="flex items-center justify-between text-[13px]">
           <span>Warning</span>
           <ChevronUp className="w-4 h-4 mute" />
@@ -253,10 +267,66 @@ function HeroCards() {
   );
 }
 
+// Scroll progress through the pinned hero (0 at the top, 1 when it releases).
+// Reduced motion → no pinning, cards shown at once.
+function useHeroScroll() {
+  const trackRef = useRef(null);
+  const videoRef = useRef(null);
+  const [p, setP] = useState(0);
+  const [still, setStill] = useState(false);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setStill(true);
+      setP(1);
+      return undefined;
+    }
+    let raf = 0;
+    let shown = 0; // eased video time
+    const tick = () => {
+      raf = 0;
+      const el = trackRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const span = r.height - window.innerHeight;
+      const prog = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+      setP(prog);
+      const v = videoRef.current;
+      if (v && v.duration) {
+        const goal = prog * (v.duration - 0.05);
+        shown += (goal - shown) * 0.25;
+        if (Math.abs(goal - shown) < 0.01) shown = goal;
+        if (!v.seeking && Math.abs(v.currentTime - shown) > 0.01) v.currentTime = shown;
+        if (shown !== goal) raf = requestAnimationFrame(tick);
+      }
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    tick();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+  return { trackRef, videoRef, p, still };
+}
+
 function Hero() {
+  const { trackRef, videoRef, p, still } = useHeroScroll();
+  const bgStyle = { filter: 'saturate(0.55) brightness(0.62) contrast(1.05)' };
   return (
-    <section className="relative min-h-[100svh] flex flex-col justify-end overflow-hidden">
-      <img src={HERO_IMG} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: 'saturate(0.55) brightness(0.62) contrast(1.05)' }} fetchpriority="high" />
+    <section ref={trackRef} className="relative" style={{ height: still ? 'auto' : '240svh' }}>
+    <div className={`${still ? 'relative' : 'sticky top-0'} min-h-[100svh] flex flex-col justify-end overflow-hidden`}>
+      <img src={HERO_IMG} alt="" className="absolute inset-0 w-full h-full object-cover" style={bgStyle} fetchpriority="high" />
+      {HERO_VIDEO && !still && (
+        <video ref={videoRef} poster={HERO_IMG} muted playsInline preload="auto" aria-hidden className="absolute inset-0 w-full h-full object-cover" style={bgStyle}>
+          <source src={`${HERO_VIDEO}.webm`} type="video/webm" />
+          <source src={`${HERO_VIDEO}.mp4`} type="video/mp4" />
+        </video>
+      )}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c0c]/80 via-[#0c0c0c]/10 to-[#0c0c0c]" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#0c0c0c]/85 via-[#0c0c0c]/20 to-transparent" />
 
@@ -292,9 +362,7 @@ function Hero() {
               </a>
             </Reveal>
           </div>
-          <Reveal delay={320}>
-            <HeroCards />
-          </Reveal>
+          <HeroCards p={p} />
         </div>
 
         <Reveal delay={400} className="mt-14 sm:mt-20 border-t hair pt-5">
@@ -304,6 +372,12 @@ function Hero() {
           </div>
         </Reveal>
       </div>
+      {!still && (
+        <div aria-hidden className="absolute bottom-5 right-6 hidden md:flex items-center gap-2 text-[11px] dim transition-opacity duration-500" style={{ opacity: p < 0.05 ? 1 : 0 }}>
+          <span className="w-px h-6 bg-white/30" /> Scroll
+        </div>
+      )}
+    </div>
     </section>
   );
 }
