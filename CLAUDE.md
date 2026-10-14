@@ -65,4 +65,10 @@ session scratchpad and export its bin/ onto PATH (ask the user first).
 - `public/media/13454d771_DigitalTwin.mp4` is 40 MB — candidate for
   Cloudflare Stream/Mux, don't let it grow siblings.
 - GitHub remote + Cloudflare Pages not yet connected (user account steps).
+- **assetstack.org** serves only the Platform page at its root, as a separate
+  Cloudflare Pages project from this repo: build command
+  `npm run build:platform`, output directory `dist-platform`
+  (`scripts/build-platform-site.mjs` copies just the files the page uses).
+  Canonical stays on assetstackai.com/Platform; every button on the page
+  links to assetstackai.com (`MAIN_SITE`/`DEMO_URL`/`CONTACT_URL` in site.js).
 - `logoCloud` section self-hides (no logos configured) — same as live.
