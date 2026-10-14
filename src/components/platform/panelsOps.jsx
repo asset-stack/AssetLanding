@@ -359,7 +359,7 @@ export function CapitalPanel() {
   const max = Math.max(...OPTIONS.map((o) => o.wolc));
   const o = OPTIONS[sel];
   return (
-    <Screen title={`Capital decision — ${L.capital.asset}`} meta="Whole-of-life cost · 20 yrs · NPV @ 4%">
+    <Screen title={`Capital decision: ${L.capital.asset}`} meta="Whole-of-life cost · 20 yrs · NPV @ 4%">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {OPTIONS.map((op, i) => (
           <button
@@ -393,7 +393,7 @@ export function CapitalPanel() {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mt-2.5">
         <Kpi label="Residual risk" value={o.risk} tone={o.risk > 60 ? 'var(--bx-c5)' : 'var(--bx-ok)'} delta={o.risk > 60 ? 'high' : 'low'} />
         <Kpi label="Life extension" value={o.life} />
-        <Kpi label="vs. defer" value={sel === 0 ? '—' : `−${fmtK(OPTIONS[0].wolc - o.wolc)}`} />
+        <Kpi label="vs. defer" value={sel === 0 ? 'Baseline' : `−${fmtK(OPTIONS[0].wolc - o.wolc)}`} />
       </div>
       <div className="mt-3 text-[12.5px] mute flex items-center gap-2">
         <ArrowRight className="w-3.5 h-3.5 flex-none" /> {o.note}

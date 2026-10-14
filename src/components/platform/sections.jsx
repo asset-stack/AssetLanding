@@ -1,64 +1,14 @@
 import React, { useState } from 'react';
-import { ArrowRight, Check, ChevronDown, Mail, Phone } from 'lucide-react';
-import { FORM_ENDPOINT, CONTACT_EMAILS } from '@/config/site';
-import { Eyebrow, Glass, Reveal, useLens } from './kit';
-import { LENSES, LENS_ORDER } from './lenses';
+import { ArrowRight, ArrowUpRight, Check, ChevronDown } from 'lucide-react';
+import { CONTACT_URL, DEMO_URL, MAIN_SITE } from '@/config/site';
+import { Eyebrow, Glass, Reveal } from './kit';
 
-// ─── Trusted by ────────────────────────────────────────────────────────────
-// Same confirmed client list (and logo files) as the homepage LogoCloud.
-
-const CLIENTS = [
-  ['BHP', 'bhp.svg'],
-  ['Acciona', 'acciona.svg'],
-  ['Alstom', 'alstom.svg'],
-  ['Cargill', 'cargill.svg'],
-  ['DP World Logistics', 'dpworld.svg'],
-  ['Pacific National', 'pacificnational.svg'],
-  ['ARTC', 'artc.png'],
-  ['Hutchison Ports Australia', 'hutchisonports.png'],
-  ['Peabody Energy', 'peabody.png'],
-  ['Whitehaven Coal', 'whitehaven.svg'],
-  ['InfraBuild', 'infrabuild.webp'],
-  ['VicTrack', 'victrack.png'],
-  ['Port of Newcastle', 'portofnewcastle.svg'],
-  ['Southern Ports', 'southernports.svg'],
-  ['Lycopodium', 'lycopodium.svg'],
-  ['Spotless', 'spotless.svg'],
-  ['Baiada', 'baiada.svg'],
-  ['Idemitsu Boggabri Coal', 'boggabri.png'],
-  ['Newcastle Coal Infrastructure Group', 'ncig.svg'],
-  ['SCT Logistics', 'sct.svg'],
-  ['ACFS Port Logistics', 'acfs.svg'],
-  ['Daracon Group', 'daracon.svg'],
-  ['Malabar Resources', 'malabar.png'],
-  ['Port of Portland', 'portofportland.svg'],
-];
+// ─── Breathing room ────────────────────────────────────────────────────────
+// The client logo strip was removed from this page; its black space stays so
+// the hero still settles before the story starts.
 
 export function Trusted() {
-  const row = [...CLIENTS, ...CLIENTS];
-  return (
-    <section className="relative py-14 border-y hair overflow-hidden" aria-label="Clients">
-      <div className="mx-auto max-w-[1180px] px-4 sm:px-6 flex flex-wrap items-baseline justify-between gap-2">
-        <Eyebrow>Trusted by operators of critical infrastructure across Australia</Eyebrow>
-        <span className="mono text-[11px] dim">{CLIENTS.length} organisations</span>
-      </div>
-      <div className="mt-8 relative" style={{ maskImage: 'linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent)', WebkitMaskImage: 'linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent)' }}>
-        <div className="marquee flex w-max items-center gap-14">
-          {row.map(([name, file], i) => (
-            <img
-              key={`${file}-${i}`}
-              src={`/media/clients/${file}`}
-              alt={i < CLIENTS.length ? name : ''}
-              aria-hidden={i >= CLIENTS.length ? 'true' : undefined}
-              loading="lazy"
-              className="h-7 w-auto max-w-[140px] object-contain opacity-50 hover:opacity-90 transition-opacity"
-              style={{ filter: 'brightness(0) invert(1)' }}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  return <div aria-hidden="true" className="h-[220px] sm:h-[194px]" />;
 }
 
 // ─── First week ────────────────────────────────────────────────────────────
@@ -165,7 +115,7 @@ export function Faq() {
           </h2>
           <p className="mt-6 text-[14px] mute">
             Something else?{' '}
-            <a href="#demo" className="text-white underline underline-offset-4 decoration-white/30 hover:decoration-white">
+            <a href={CONTACT_URL} className="text-white underline underline-offset-4 decoration-white/30 hover:decoration-white">
               Ask us directly
             </a>
             .
@@ -193,7 +143,7 @@ export function Faq() {
                         {q.startsWith('Where') && (
                           <>
                             {' '}
-                            <a href="/SecurityDocs" className="text-white underline underline-offset-4 decoration-white/30">
+                            <a href={`${MAIN_SITE}/SecurityDocs`} className="text-white underline underline-offset-4 decoration-white/30">
                               Security documentation
                             </a>
                           </>
@@ -211,63 +161,11 @@ export function Faq() {
   );
 }
 
-// ─── Demo request ──────────────────────────────────────────────────────────
-// Same delivery as the site's ContactSection: JSON POST to FORM_ENDPOINT,
-// or a pre-filled mailto when no endpoint is configured (never fake success).
-
-const INDUSTRIES = [...LENS_ORDER.map((id) => LENSES[id].label), 'Other'];
-
-function Field({ label, children }) {
-  return (
-    <label className="block">
-      <span className="block text-[12px] text-white/70 mb-1.5">{label}</span>
-      {children}
-    </label>
-  );
-}
-
-const inputCls =
-  'w-full h-11 rounded-[12px] bg-white/[0.08] border border-white/15 px-3.5 text-[14px] text-white placeholder:text-white/35 outline-none focus:border-white/60 focus:bg-white/[0.12] transition-colors';
+// ─── Demo ──────────────────────────────────────────────────────────────────
+// This page exists to send people to the core site, so the demo block links
+// to assetstackai.com instead of collecting details itself.
 
 export function Demo() {
-  const lens = useLens();
-  const [form, setForm] = useState({ name: '', email: '', org: '', industry: '', message: '' });
-  const industry = form.industry || lens.label; // follows the page's industry lens until chosen
-  const [state, setState] = useState('idle'); // idle | sending | sent | error
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-
-  const submit = async (e) => {
-    e.preventDefault();
-    if (!form.email) return;
-    const fields = {
-      name: form.name,
-      email: form.email,
-      organisation: form.org,
-      industry,
-      message: form.message,
-      source: 'Platform landing page',
-    };
-    if (!FORM_ENDPOINT) {
-      const body = Object.entries(fields)
-        .map(([k, v]) => `${k}: ${v}`)
-        .join('\n');
-      window.location.href = `mailto:${CONTACT_EMAILS.join(',')}?subject=${encodeURIComponent(`Demo request — ${industry}`)}&body=${encodeURIComponent(body)}`;
-      return;
-    }
-    setState('sending');
-    try {
-      const res = await fetch(FORM_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(fields),
-      });
-      if (!res.ok) throw new Error(String(res.status));
-      setState('sent');
-    } catch {
-      setState('error');
-    }
-  };
-
   return (
     <section id="demo" className="relative scroll-mt-20 overflow-hidden" style={{ background: 'linear-gradient(160deg, #1232f6 0%, #0a1ee0 45%, #0000d3 100%)' }}>
       <img
@@ -293,79 +191,31 @@ export function Demo() {
             Every source of asset data, one platform for predictive maintenance. Bring a register, a SCADA export or a single
             critical asset and we will show you what it is telling you in the first session.
           </p>
-          <div className="mt-8 space-y-2.5 text-[14px] text-white/85">
-            <a href="mailto:hello@assetstackai.com" className="flex items-center gap-3 hover:text-white">
-              <Mail className="w-4 h-4 text-white/60" /> hello@assetstackai.com
-            </a>
-            <a href="tel:+61439032387" className="flex items-center gap-3 hover:text-white">
-              <Phone className="w-4 h-4 text-white/60" /> +61 439 032 387
-            </a>
-          </div>
         </Reveal>
 
         <Reveal delay={120}>
           <Glass className="p-6 sm:p-8 !bg-[rgba(0,0,40,0.28)]">
-            {state === 'sent' ? (
-              <div className="py-12 text-center">
-                <div className="w-12 h-12 rounded-full bg-white/15 grid place-items-center mx-auto">
-                  <Check className="w-5 h-5" />
-                </div>
-                <div className="mt-5 text-[20px] font-medium">Thanks, we’ll be in touch.</div>
-                <p className="mt-2 text-[14px] text-white/70">Someone from the team will reply within one business day.</p>
-              </div>
-            ) : (
-              <form onSubmit={submit} className="space-y-4">
-                <div className="text-[18px] font-medium">Book a demo</div>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <Field label="Name">
-                    <input className={inputCls} value={form.name} onChange={set('name')} placeholder="Jane Doe" autoComplete="name" />
-                  </Field>
-                  <Field label="Work email">
-                    <input className={inputCls} type="email" required value={form.email} onChange={set('email')} placeholder="jane@company.com.au" autoComplete="email" />
-                  </Field>
-                </div>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <Field label="Organisation">
-                    <input className={inputCls} value={form.org} onChange={set('org')} placeholder="Company or council" autoComplete="organization" />
-                  </Field>
-                  <Field label="Industry">
-                    <select className={`${inputCls} appearance-none`} value={industry} onChange={set('industry')}>
-                      {INDUSTRIES.map((s) => (
-                        <option key={s} value={s} className="text-black">
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-                </div>
-                <Field label="What would you like to see?">
-                  <textarea
-                    rows={3}
-                    className={`${inputCls} h-auto py-3 resize-none`}
-                    value={form.message}
-                    onChange={set('message')}
-                    placeholder="Asset count, data sources, the failures that cost you most…"
-                  />
-                </Field>
-                <button
-                  type="submit"
-                  disabled={state === 'sending'}
-                  className="w-full h-12 rounded-full bg-white text-[#0000d3] text-[15px] font-medium inline-flex items-center justify-center gap-2 hover:bg-white/90 transition-colors disabled:opacity-60"
-                >
-                  {state === 'sending' ? 'Sending…' : (
-                    <>
-                      Request a demo <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-                {state === 'error' && (
-                  <p className="text-[12.5px] text-center text-white" role="alert">
-                    Something went wrong. Please email us at {CONTACT_EMAILS[0]}.
-                  </p>
-                )}
-                <p className="text-[11.5px] text-white/55 text-center">We’ll only use your details to contact you about AssetStack.</p>
-              </form>
-            )}
+            <div className="text-[18px] font-medium">See it on your own data</div>
+            <p className="mt-2 text-[14px] text-white/70 leading-[1.6]">
+              Book a walkthrough with the team at assetstackai.com, or get in touch with a question first.
+            </p>
+            <div className="mt-7 space-y-3">
+              <a
+                href={DEMO_URL}
+                className="w-full h-12 rounded-full bg-white text-[#0000d3] text-[15px] font-medium inline-flex items-center justify-center gap-2 hover:bg-white/90 transition-colors"
+              >
+                Book a demo <ArrowRight className="w-4 h-4" />
+              </a>
+              <a
+                href={CONTACT_URL}
+                className="w-full h-12 rounded-full border border-white/30 text-white text-[15px] inline-flex items-center justify-center gap-2 hover:bg-white/10 transition-colors"
+              >
+                Contact us <ArrowUpRight className="w-4 h-4" />
+              </a>
+            </div>
+            <a href={MAIN_SITE} className="mt-6 block text-center text-[12.5px] text-white/55 hover:text-white">
+              Visit assetstackai.com
+            </a>
           </Glass>
         </Reveal>
       </div>

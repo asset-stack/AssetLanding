@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, ArrowRight, ArrowUpRight, CheckCircle2, ChevronUp, Menu, X } from 'lucide-react';
-import { PLATFORM_URL } from '@/config/site';
+import { CONTACT_URL, DEMO_URL, MAIN_SITE } from '@/config/site';
 import { Eyebrow, Glass, LensContext, NoisyChart, Num, Reveal, useLens, useSetLens } from '@/components/platform/kit';
 import { CORE, LENSES, LENS_ORDER } from '@/components/platform/lenses';
 import { DashboardPanel, ConditionPanel, FwpPanel, AssetTreePanel, TwinPanel, EquipmentPanel, SensorsPanel } from '@/components/platform/panelsCondition';
@@ -8,7 +8,7 @@ import { MaintenancePanel, PredictionsPanel, AnalyticsPanel, CascadePanel, Capit
 import { IngestPanel, ReadinessPanel, CompliancePanel } from '@/components/platform/panelsNew';
 import { Demo, Faq, FirstWeek, Trusted } from '@/components/platform/sections';
 
-// AssetStack — the platform story across five core industries, told as the
+// AssetStack: the platform story across five core industries, told as the
 // data journey (ingest → understand → predict → act → prove). A sticky
 // industry lens re-skins every platform view. All data is illustrative.
 
@@ -25,7 +25,7 @@ const CHAPTERS = [
     n: '01',
     label: 'Ingest',
     title: 'Pull in every source you already have.',
-    intro: 'SCADA tags, sensor streams, work orders, registers, inspection photos and LiDAR scans — matched to the right asset and housed in one model.',
+    intro: 'SCADA tags, sensor streams, work orders, registers, inspection photos and LiDAR scans, matched to the right asset and housed in one model.',
     features: [
       { k: 'Data sources', d: 'Every source connected and matched to one asset record, with the models that read it.', P: IngestPanel },
       { k: 'Portfolio view', d: 'Everything you own on one map, coloured by condition, with live alerts and an AssetMind summary.', P: DashboardPanel },
@@ -144,7 +144,7 @@ function Nav() {
           scrolled ? '' : '!bg-transparent !shadow-none before:!opacity-0 !backdrop-blur-0'
         }`}
       >
-        <a href="/Platform" className="flex items-center gap-2.5" aria-label="AssetStack platform">
+        <a href={MAIN_SITE} className="flex items-center gap-2.5" aria-label="AssetStack home">
           <img src="/media/buildings/as-symbol-colour.webp" alt="" width="20" height="20" className="w-5 h-5" />
           <img src="/media/buildings/as-wordmark-white.webp" alt="AssetStack" height="16" className="h-[15px] w-auto" />
           <span className="hidden sm:inline text-[11.5px] dim ml-1.5 pl-3 border-l hair">Platform</span>
@@ -157,12 +157,7 @@ function Nav() {
           ))}
         </nav>
         <div className="flex items-center gap-1.5">
-          <span className="hidden sm:block">
-            <a href={PLATFORM_URL} className="btn !h-10 !px-4 mute hover:!text-white">
-              Sign in
-            </a>
-          </span>
-          <a href="#demo" className="btn btn-light !h-10 !px-4">
+          <a href={DEMO_URL} className="btn btn-light !h-10 !px-4">
             Book a demo
           </a>
           <span className="lg:hidden">
@@ -185,9 +180,6 @@ function Nav() {
               {g.label} <span className="mono text-[11px] dim">{g.n}</span>
             </a>
           ))}
-          <a href={PLATFORM_URL} className="flex px-4 py-3 text-[15px] mute">
-            Sign in
-          </a>
         </Glass>
       )}
     </header>
@@ -348,16 +340,16 @@ function Hero() {
             </Reveal>
             <Reveal delay={160}>
               <p className="mt-7 max-w-[520px] text-[16px] leading-[1.6] mute">
-                AssetStack pulls in every source — SCADA, sensors, work orders, registers, inspections and scans — houses and
+                AssetStack pulls in every source (SCADA, sensors, work orders, registers, inspections and scans), houses and
                 understands it, and turns it into predictive maintenance across buildings, rail, mining, power and heavy civil
                 infrastructure.
               </p>
             </Reveal>
             <Reveal delay={240} className="mt-9 flex flex-wrap gap-2.5">
-              <a href="#demo" className="btn btn-light">
+              <a href={DEMO_URL} className="btn btn-light">
                 Book a demo
               </a>
-              <a href="#ingest" className="btn btn-ghost">
+              <a href={`${MAIN_SITE}/Product`} className="btn btn-ghost">
                 See how it works <ArrowRight className="w-4 h-4" />
               </a>
             </Reveal>
@@ -366,7 +358,7 @@ function Hero() {
         </div>
 
         <Reveal delay={400} className="mt-14 sm:mt-20 border-t hair pt-5">
-          <div className="text-[12px] mute mb-3">Choose your industry — every view on this page follows it</div>
+          <div className="text-[12px] mute mb-3">Choose your industry. Every view on this page follows it.</div>
           <div className="-mx-4 px-4 scroll-x">
             <LensPills />
           </div>
@@ -610,10 +602,10 @@ function Footer() {
           <span className="mono text-[10.5px] dim ml-2">© {new Date().getFullYear()}</span>
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] mute">
-          <a href="/" className="hover:text-white">assetstackai.com</a>
-          <a href="/Product" className="hover:text-white">Product</a>
-          <a href="/SecurityDocs" className="hover:text-white">Security</a>
-          <a href="/Contact" className="hover:text-white">Contact</a>
+          <a href={MAIN_SITE} className="hover:text-white">assetstackai.com</a>
+          <a href={`${MAIN_SITE}/Product`} className="hover:text-white">Product</a>
+          <a href={`${MAIN_SITE}/SecurityDocs`} className="hover:text-white">Security</a>
+          <a href={CONTACT_URL} className="hover:text-white">Contact</a>
         </nav>
       </div>
       <div className="mx-auto max-w-[1180px] px-4 sm:px-6 pb-10 text-[11.5px] dim">Platform views show illustrative sample data for each industry.</div>

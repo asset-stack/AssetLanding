@@ -295,7 +295,7 @@ export function AssetTreePanel() {
   const rx = (i) => 110 + (i * (W - 220)) / (loc.subs.length - 1);
   const font = 'Inter Tight, sans-serif';
   return (
-    <Screen title="Asset register" meta={`Every asset organised by ${P.hierarchy} — one defensible register`}>
+    <Screen title="Asset register" meta={`Every asset organised by ${P.hierarchy}, in one defensible register`}>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <Kpi label="Total assets" value={P.assets} />
         <Kpi label={P.sitesLabel} value={P.sitesN} />
@@ -586,7 +586,7 @@ export function SensorsPanel() {
     }),
   );
   return (
-    <Screen title="Sensors" meta="MQTT · REST · CSV — live streams">
+    <Screen title="Sensors" meta="MQTT · REST · CSV · live streams">
       <div className="grid sm:grid-cols-2 gap-2.5">
         {L.signals.map((s, k) => {
           const v = series[k][series[k].length - 1];

@@ -5,6 +5,12 @@
 // Where "Sign in" goes. Plain link — no auth SDK on the marketing site.
 export const PLATFORM_URL = 'https://bunburycouncil.assetstack.site/';
 
+// Campaign pages (e.g. /Platform) send every call to action back to the core
+// site. Absolute so they also work when a page is shared stand-alone.
+export const MAIN_SITE = 'https://assetstackai.com';
+export const DEMO_URL = `${MAIN_SITE}/#contact`;
+export const CONTACT_URL = `${MAIN_SITE}/Contact`;
+
 // Contact form delivery.
 // FORM_ENDPOINT: a form backend that accepts a JSON POST (e.g. Formspree:
 // create a form at https://formspree.io and paste its URL here, like

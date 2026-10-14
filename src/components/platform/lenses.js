@@ -139,11 +139,11 @@ export const LENSES = {
       levels: ['Roof', 'Level 1', 'Ground'],
       spots: [
         [
-          { x: 0.32, y: 0.4, c: 4, t: 'Membrane — Zone B', d: 'Ponding + split seam · photo 14 d ago' },
+          { x: 0.32, y: 0.4, c: 4, t: 'Membrane, Zone B', d: 'Ponding + split seam · photo 14 d ago' },
           { x: 0.66, y: 0.58, c: 3, t: 'Rooftop AHU-03', d: 'Coil corrosion' },
         ],
         [
-          { x: 0.44, y: 0.5, c: 4, t: 'Ceiling — Room 1.12', d: 'Water staining below Zone B' },
+          { x: 0.44, y: 0.5, c: 4, t: 'Ceiling, Room 1.12', d: 'Water staining below Zone B' },
           { x: 0.72, y: 0.36, c: 2, t: 'Lighting circuit DB-1A', d: 'Normal · sensor live' },
         ],
         [
@@ -158,7 +158,7 @@ export const LENSES = {
       disc: ['All', 'Mechanical', 'Electrical', 'Hydraulics', 'Envelope'],
       rows: [
         ['P-02', 'Pool circulation pump', 'Aquatic Centre', 'Mechanical', 2009, 5, '$58,000'],
-        ['CH-01', 'Chiller — centrifugal', 'Aquatic Centre', 'Mechanical', 2009, 4, '$184,000'],
+        ['CH-01', 'Chiller (centrifugal)', 'Aquatic Centre', 'Mechanical', 2009, 4, '$184,000'],
         ['MSB', 'Main switchboard', 'Works Depot', 'Electrical', 1998, 3, '$96,000'],
         ['AHU-03', 'Air handling unit', 'Library & Gallery', 'Mechanical', 2015, 2, '$64,500'],
         ['HWS-02', 'Hot water plant', 'Sports Complex', 'Hydraulics', 2011, 3, '$41,000'],
@@ -190,7 +190,7 @@ export const LENSES = {
       ],
     },
     cascade: {
-      meta: 'Roof membrane — Community Hall',
+      meta: 'Roof membrane, Community Hall',
       today: 18,
       nodes: [
         ['Roof membrane split', 'Zone B · grade 4', 4, 18],
@@ -211,7 +211,7 @@ export const LENSES = {
       meta: 'Work orders · this week · 38 active',
       kpis: [['Planned : reactive', '71:29', '▲ 9 pts', 'ok'], ['Mean time to repair', '3.4d', '▼ 1.1d', 'ok'], ['Compliance due', '12', '30 days'], ['Spend MTD', '$148k', 'of $210k']],
       cols: [
-        ['Open', [['WO-4819', 'Roof membrane — Zone B make-safe', 'Community Hall', 4, 'Reactive']]],
+        ['Open', [['WO-4819', 'Roof membrane Zone B make-safe', 'Community Hall', 4, 'Reactive']]],
         ['Scheduled', [['WO-4821', 'Pump P-02 bearing replacement', 'Aquatic Centre', 5, 'Predictive'], ['PM-2204', 'Quarterly AHU filter change', 'Library & Gallery', 2, 'Planned'], ['PM-2198', 'Annual fire panel test', 'Childcare Centre', 1, 'Compliance']]],
         ['In progress', [['WO-4802', 'Switchboard thermal re-torque', 'Works Depot', 3, 'Predictive']]],
       ],
@@ -250,7 +250,7 @@ export const LENSES = {
     capital: {
       asset: 'Chiller CH-01',
       options: [
-        { k: 'Defer', capex: 0, wolc: 412000, risk: 92, life: '—', note: '38% chance of unplanned failure in 12 months' },
+        { k: 'Defer', capex: 0, wolc: 412000, risk: 92, life: 'n/a', note: '38% chance of unplanned failure in 12 months' },
         { k: 'Repair', capex: 38000, wolc: 356000, risk: 64, life: '+3 yrs', note: 'Bearing + compressor rebuild; efficiency unchanged' },
         { k: 'Refurbish', capex: 96000, wolc: 318000, risk: 41, life: '+8 yrs', note: 'Major overhaul, new controls' },
         { k: 'Replace', capex: 184000, wolc: 271000, risk: 12, life: '+20 yrs', note: 'High-efficiency unit · saves $14k / yr in energy', best: true },
@@ -422,7 +422,7 @@ export const LENSES = {
       ],
     },
     cascade: {
-      meta: 'Signal Box 12 relay rack — Brunswick Junction',
+      meta: 'Signal Box 12 relay rack, Brunswick Junction',
       today: 22,
       nodes: [
         ['Relay contact wear', 'Rack RR-3 · grade 5', 5, 22],
@@ -450,7 +450,7 @@ export const LENSES = {
       loadLabel: 'Possession windows · hours booked',
       days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'],
       load: [94, 20, 35, 82, 40],
-      window: 'Four jobs bundled into one Sunday possession — one track closure instead of four',
+      window: 'Four jobs bundled into one Sunday possession: one track closure instead of four',
     },
     readiness: {
       title: 'Return to service',
@@ -482,7 +482,7 @@ export const LENSES = {
     capital: {
       asset: 'Bridge BR-04 deck',
       options: [
-        { k: 'Defer', capex: 0, wolc: 2860000, risk: 88, life: '—', note: 'Speed restriction likely within 18 months' },
+        { k: 'Defer', capex: 0, wolc: 2860000, risk: 88, life: 'n/a', note: 'Speed restriction likely within 18 months' },
         { k: 'Repair', capex: 240000, wolc: 2340000, risk: 61, life: '+6 yrs', note: 'Bearing reset and deck patching' },
         { k: 'Strengthen', capex: 620000, wolc: 1980000, risk: 32, life: '+20 yrs', note: 'Steel plate bonding, new bearings', best: true },
         { k: 'Replace', capex: 1200000, wolc: 2120000, risk: 9, life: '+50 yrs', note: 'New deck · 9-day line closure' },
@@ -654,7 +654,7 @@ export const LENSES = {
       ],
     },
     cascade: {
-      meta: 'Conveyor CV-7 drive — overland conveyor',
+      meta: 'Conveyor CV-7 drive, overland conveyor',
       today: 46,
       nodes: [
         ['Gearbox bearing wear', 'CV-7 drive · grade 4', 4, 46],
@@ -714,7 +714,7 @@ export const LENSES = {
     capital: {
       asset: 'Conveyor CV-7 drive',
       options: [
-        { k: 'Run to failure', capex: 0, wolc: 3900000, risk: 94, life: '—', note: 'Likely belt rip and 3-day stop within 6 months' },
+        { k: 'Run to failure', capex: 0, wolc: 3900000, risk: 94, life: 'n/a', note: 'Likely belt rip and 3-day stop within 6 months' },
         { k: 'Repair', capex: 46000, wolc: 2400000, risk: 58, life: '+2 yrs', note: 'Bearing replacement at next shutdown' },
         { k: 'Overhaul', capex: 180000, wolc: 1720000, risk: 24, life: '+8 yrs', note: 'Gearbox overhaul, new couplings, alignment', best: true },
         { k: 'Replace', capex: 640000, wolc: 1910000, risk: 8, life: '+15 yrs', note: 'New drive package · longer shutdown' },
@@ -886,7 +886,7 @@ export const LENSES = {
       ],
     },
     cascade: {
-      meta: 'Transformer TX-6 — Substation Alpha',
+      meta: 'Transformer TX-6, Substation Alpha',
       today: 38,
       nodes: [
         ['Insulation breakdown', 'TX-6 · DGA flagged', 4, 38],
@@ -914,7 +914,7 @@ export const LENSES = {
       loadLabel: 'Crew load · next 5 days',
       days: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon'],
       load: [58, 64, 92, 30, 66],
-      window: 'Three jobs share one Saturday outage — customers lose supply once, not three times',
+      window: 'Three jobs share one Saturday outage, so customers lose supply once, not three times',
     },
     readiness: {
       title: 'Peak season readiness',
@@ -946,7 +946,7 @@ export const LENSES = {
     capital: {
       asset: 'Transformer TX-6',
       options: [
-        { k: 'Defer', capex: 0, wolc: 4200000, risk: 90, life: '—', note: 'High chance of in-service failure and 4,200-customer outage' },
+        { k: 'Defer', capex: 0, wolc: 4200000, risk: 90, life: 'n/a', note: 'High chance of in-service failure and 4,200-customer outage' },
         { k: 'Refurbish', capex: 210000, wolc: 2760000, risk: 52, life: '+7 yrs', note: 'Oil regeneration, new bushings, tap changer overhaul' },
         { k: 'Replace', capex: 1450000, wolc: 2310000, risk: 10, life: '+40 yrs', note: 'New low-loss unit · saves $38k / yr in losses', best: true },
         { k: 'Replace + 2nd unit', capex: 2600000, wolc: 3080000, risk: 4, life: '+40 yrs', note: 'N-1 redundancy for the zone' },
@@ -1118,7 +1118,7 @@ export const LENSES = {
       ],
     },
     cascade: {
-      meta: 'Expansion joint 2 — Harbour Road bridge',
+      meta: 'Expansion joint 2, Harbour Road bridge',
       today: 24,
       nodes: [
         ['Joint seal failure', 'Joint 2 · grade 4', 4, 24],
@@ -1178,7 +1178,7 @@ export const LENSES = {
     capital: {
       asset: 'Harbour Road bridge joints',
       options: [
-        { k: 'Defer', capex: 0, wolc: 1640000, risk: 86, life: '—', note: 'Bearing lock-up and pier cracking likely within 2 years' },
+        { k: 'Defer', capex: 0, wolc: 1640000, risk: 86, life: 'n/a', note: 'Bearing lock-up and pier cracking likely within 2 years' },
         { k: 'Reseal', capex: 38000, wolc: 1120000, risk: 54, life: '+4 yrs', note: 'New seals only; joints stay at grade 4' },
         { k: 'Replace joints', capex: 156000, wolc: 690000, risk: 14, life: '+25 yrs', note: 'Modular joints · protects bearings and piers', best: true },
         { k: 'Joint + bearings', capex: 420000, wolc: 780000, risk: 6, life: '+30 yrs', note: 'Full end-of-deck renewal · 2 weekend closures' },
