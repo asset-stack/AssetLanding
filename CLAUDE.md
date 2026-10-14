@@ -71,4 +71,10 @@ session scratchpad and export its bin/ onto PATH (ask the user first).
   (`scripts/build-platform-site.mjs` copies just the files the page uses).
   Canonical stays on assetstackai.com/Platform; every button on the page
   links to assetstackai.com (`MAIN_SITE`/`DEMO_URL`/`CONTACT_URL` in site.js).
+  Cloudflare Pages project: **`assetstack-org`** (separate from the
+  `assetlanding` project that serves assetstackai.com). Production branch is
+  `claude/asset-stack-buildings-landing-iumb6w` until that branch is merged,
+  then switch it to `main`. Domain registered at Hostinger, nameservers on
+  Cloudflare; custom domains `assetstack.org` + `www.assetstack.org`
+  (www redirects to the apex).
 - `logoCloud` section self-hides (no logos configured) — same as live.
