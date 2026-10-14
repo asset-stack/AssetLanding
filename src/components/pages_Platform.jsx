@@ -7,7 +7,6 @@ import { DashboardPanel, ConditionPanel, FwpPanel, AssetTreePanel, TwinPanel, Eq
 import { MaintenancePanel, PredictionsPanel, AnalyticsPanel, CascadePanel, CapitalPanel, FundingPanel } from '@/components/platform/panelsOps';
 import { IngestPanel, ReadinessPanel, CompliancePanel } from '@/components/platform/panelsNew';
 import { Demo, Faq, FirstWeek, Trusted } from '@/components/platform/sections';
-import LockFieldBanner from '@/components/landing/LockFieldBanner';
 
 // AssetStack — the platform story across five core industries, told as the
 // data journey (ingest → understand → predict → act → prove). A sticky
@@ -562,7 +561,6 @@ export default function Platform() {
         <Nav />
         <main>
           <Hero />
-          <LockFieldBanner theme="dark" />
           <Trusted />
           <Context />
           <div className="relative">
