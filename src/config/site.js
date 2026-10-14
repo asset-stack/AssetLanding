@@ -21,6 +21,7 @@ export const CONTACT_EMAILS = ['david@assetstackai.com', 'josh@assetstackai.com'
 // Keys must match SECTION_REGISTRY in components/landing/sectionRegistry.jsx.
 export const SECTION_ORDER = [
   'hero',
+  'lockField',
   'personaSwitcher',
   'industries',
   'mechanism',

@@ -18,6 +18,7 @@ function lazyWithRetry(factory) {
 }
 
 // Lazy loaded (below the fold)
+const LockFieldBanner = lazyWithRetry(() => import('@/components/landing/LockFieldBanner'));
 const LogoCloud = lazyWithRetry(() => import('@/components/landing/LogoCloud'));
 const PersonaSwitcher = lazyWithRetry(() => import('@/components/landing/PersonaSwitcher'));
 const WhatsNewShowcase = lazyWithRetry(() => import('@/components/landing/WhatsNewShowcase'));
@@ -45,6 +46,7 @@ const SisterFeaturesGrid = lazyWithRetry(() => import('@/components/landing/sist
 export const SECTION_REGISTRY = {
   hero:                 { label: 'Hero',                    description: 'Top hero with live AssetMind widget',   component: LandingHero,           lazy: false, fallbackHeight: 0 },
   assetMind:            { label: 'AssetMind Demo',          description: 'Interactive AssetMind chat and Command Center', component: AssetMindSection,      lazy: false, fallbackHeight: 600 },
+  lockField:            { label: 'Lock Field Banner',       description: 'Interactive lock grid that sinks under the cursor', component: LockFieldBanner, lazy: true,  fallbackHeight: 520 },
   logoCloud:            { label: 'Logo Wall',               description: 'Customer / partner logos',              component: LogoCloud,             lazy: true,  fallbackHeight: 420 },
   personaSwitcher:      { label: 'Persona Switcher',        description: 'Tailors the rest of the page',          component: PersonaSwitcher,       lazy: true,  fallbackHeight: 520 },
   mechanism:            { label: 'How It Works (Mechanism)',description: 'How AssetStack actually works',         component: MechanismSection,      lazy: true,  fallbackHeight: 640 },
