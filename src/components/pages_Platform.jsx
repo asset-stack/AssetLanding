@@ -13,10 +13,10 @@ import { Demo, Faq, FirstWeek, Trusted } from '@/components/platform/sections';
 // industry lens re-skins every platform view. All data is illustrative.
 
 const M = '/media/buildings/';
-const HERO_IMG = `${M}map-aerial-angled.webp`;
+const HERO_IMG = `${M}hero-drone-poster.webp`; // first frame of HERO_VIDEO
 // Drone flyover of the same aerial shot, scrubbed by scroll. Empty → the
 // still image stays as the hero background.
-const HERO_VIDEO = ''; // base path: .webm (VP9) first, .mp4 (H.264) fallback
+const HERO_VIDEO = '/media/platform-hero-drone'; // base path: .mp4 (H.264) first, .webm (VP9) fallback
 const BAND_IMG = `${M}photo-worker.webp`;
 
 const CHAPTERS = [
@@ -323,8 +323,8 @@ function Hero() {
       <img src={HERO_IMG} alt="" className="absolute inset-0 w-full h-full object-cover" style={bgStyle} fetchpriority="high" />
       {HERO_VIDEO && !still && (
         <video ref={videoRef} poster={HERO_IMG} muted playsInline preload="auto" aria-hidden className="absolute inset-0 w-full h-full object-cover" style={bgStyle}>
-          <source src={`${HERO_VIDEO}.webm`} type="video/webm" />
           <source src={`${HERO_VIDEO}.mp4`} type="video/mp4" />
+          <source src={`${HERO_VIDEO}.webm`} type="video/webm" />
         </video>
       )}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c0c]/80 via-[#0c0c0c]/10 to-[#0c0c0c]" />
