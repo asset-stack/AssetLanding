@@ -72,7 +72,7 @@ session scratchpad and export its bin/ onto PATH (ask the user first).
   Canonical stays on assetstackai.com/Platform; every button on the page
   links to assetstackai.com (`MAIN_SITE`/`DEMO_URL`/`CONTACT_URL` in site.js).
   Cloudflare Pages project: **`assetstack-org`** (separate from the
-  `assetlanding` project that serves assetstackai.com). Production branch is
+  existing `assetlanding` project on the same account). Production branch is
   `claude/asset-stack-buildings-landing-iumb6w` until that branch is merged,
   then switch it to `main`. Domain registered at Hostinger, nameservers on
   Cloudflare; custom domains `assetstack.org` + `www.assetstack.org`
