@@ -1,9 +1,10 @@
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useId, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { LENSES } from './lenses';
 
-// ─── Sample portfolio ──────────────────────────────────────────────────────
-// Illustrative data only — every panel on /Buildings renders from this, so
-// numbers stay consistent across the page. Not a real customer.
+// ─── Industry lens ─────────────────────────────────────────────────────────
+// Every platform view reads its example data from the active lens
+// (see lenses.js). All figures are illustrative.
 
 export const COND = {
   1: { label: 'Excellent', color: 'var(--bx-c1)' },
@@ -13,30 +14,9 @@ export const COND = {
   5: { label: 'Very poor', color: 'var(--bx-c5)' },
 };
 
-export const BUILDINGS = [
-  { id: 'AQU-03', name: 'Aquatic Centre', type: 'Recreation', cond: 4, risk: 86, x: 380, y: 236, gfa: '6,420 m²' },
-  { id: 'HAL-05', name: 'Community Hall', type: 'Community', cond: 4, risk: 72, x: 470, y: 150, gfa: '940 m²' },
-  { id: 'DEP-04', name: 'Works Depot', type: 'Operational', cond: 3, risk: 61, x: 560, y: 330, gfa: '3,100 m²' },
-  { id: 'CIV-01', name: 'Council Chambers', type: 'Administration', cond: 3, risk: 58, x: 312, y: 170, gfa: '8,860 m²' },
-  { id: 'REC-08', name: 'Sports Complex', type: 'Recreation', cond: 3, risk: 49, x: 640, y: 210, gfa: '4,210 m²' },
-  { id: 'LIB-02', name: 'Library & Gallery', type: 'Cultural', cond: 2, risk: 34, x: 250, y: 300, gfa: '3,740 m²' },
-  { id: 'CCC-06', name: 'Childcare Centre', type: 'Community', cond: 2, risk: 28, x: 470, y: 400, gfa: '760 m²' },
-  { id: 'AIR-07', name: 'Airport Terminal', type: 'Transport', cond: 1, risk: 12, x: 700, y: 400, gfa: '2,050 m²' },
-];
-
-// Mirrors the AssetStack demo workspace (Dashboard + Asset Register views).
-export const PORTFOLIO = {
-  name: 'Sample council portfolio',
-  buildings: 12,
-  components: '4,108',
-  rooms: 241,
-  avgCond: '2.7',
-  critical: 143,
-  health: '57%',
-  peakYear: 2052,
-  remLife: '12.2',
-  fwp: '$2.70M',
-};
+export const LensContext = createContext({ lens: LENSES.buildings, setLens: () => {} });
+export const useLens = () => useContext(LensContext).lens;
+export const useSetLens = () => useContext(LensContext).setLens;
 
 export const fmtM = (v) => `$${(v / 1e6).toFixed(v >= 1e7 ? 1 : 2)}M`;
 export const fmtK = (v) => (v >= 1e6 ? fmtM(v) : `$${Math.round(v / 1000)}k`);
@@ -186,7 +166,8 @@ export function Sparkline({ data, w = 120, h = 32, stroke = '#ededef', fill = tr
 }
 
 // ─── Dark city map ─────────────────────────────────────────────────────────
-// Graded satellite base with a faint vector street overlay and condition pins.
+// Graded satellite base with a faint vector street overlay and condition pins
+// for the active lens's sites.
 
 const MAP_W = 800;
 const MAP_H = 500;
@@ -212,6 +193,7 @@ function buildStreets() {
 const STREETS = buildStreets();
 
 export function CityMap({ selected, onSelect, compact = false, className = '' }) {
+  const lens = useLens();
   return (
     <div className={`relative overflow-hidden rounded-[14px] border hair bg-[#101010] ${className}`}>
       <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="absolute inset-0 block w-full h-full" preserveAspectRatio="xMidYMid slice">
@@ -223,7 +205,7 @@ export function CityMap({ selected, onSelect, compact = false, className = '' })
         </defs>
         {/* satellite base, graded down to sit behind the data */}
         <image
-          href="/media/buildings/map-topdown-town.webp"
+          href={lens.mapImg}
           x="-40"
           y="-20"
           width={MAP_W + 80}
@@ -244,7 +226,7 @@ export function CityMap({ selected, onSelect, compact = false, className = '' })
         <rect width={MAP_W} height={MAP_H} fill="url(#mapVignette)" />
 
         {/* building pins */}
-        {BUILDINGS.map((b) => {
+        {lens.sites.map((b) => {
           const on = selected === b.id;
           const col = COND[b.cond].color;
           return (

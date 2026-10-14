@@ -16,6 +16,8 @@ export default defineConfig({
   // Old Base44 route aliases — keep inbound links working.
   redirects: {
     '/Landing': '/',
+    // The Buildings & Facilities test page grew into the all-industry platform page.
+    '/Buildings': '/Platform',
   },
   integrations: [react(), tailwind({ applyBaseStyles: false })],
   vite: {

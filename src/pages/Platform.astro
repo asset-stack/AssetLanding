@@ -1,0 +1,14 @@
+---
+import Base from '@/layouts/Base.astro';
+import Page from '@/components/pages_Platform.jsx';
+import '@/styles/platform.css';
+---
+
+<Base
+  title={`Platform — the intelligence layer for all your asset data | AssetStack`}
+  description={`AssetStack pulls in SCADA, sensors, work orders, registers, inspections and scans, and turns them into predictive maintenance for buildings, rail, mining, oil and gas, power, utilities and heavy civil infrastructure.`}
+  path="/Platform"
+  ogImage="/og-platform.jpg"
+>
+  <Page client:load />
+</Base>

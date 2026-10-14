@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowRight, Check, ChevronDown, Mail, Phone } from 'lucide-react';
 import { FORM_ENDPOINT, CONTACT_EMAILS } from '@/config/site';
-import { Eyebrow, Glass, Reveal } from './kit';
+import { Eyebrow, Glass, Reveal, useLens } from './kit';
+import { LENSES, LENS_ORDER } from './lenses';
 
 // ─── Trusted by ────────────────────────────────────────────────────────────
 // Same confirmed client list (and logo files) as the homepage LogoCloud.
@@ -64,7 +65,7 @@ export function Trusted() {
 // Mirrors the homepage "Your first 7 days" deliverables.
 
 const DAYS = [
-  ['1', 'Asset register imported', 'Your Excel or CSV register mapped to Location → Room → Asset, with every site geocoded.'],
+  ['1', 'Asset register imported', 'Your Excel or CSV register mapped to your own hierarchy, with every site geocoded.'],
   ['2', 'Condition baseline', 'Photos and existing reports graded, so every component carries a 1 – 5 condition and remaining life.'],
   ['3', 'Predictions running', 'Risk scores and failure probability computed for critical plant.'],
   ['4', 'Funding plan optimised', 'A capital plan built against your budget, ranked by risk reduced per dollar.'],
@@ -117,16 +118,20 @@ export function FirstWeek() {
 
 const FAQS = [
   [
+    'Which industries is AssetStack built for?',
+    'Five core industries: buildings and facilities, rail infrastructure, mining, oil and gas, power and utilities, and heavy civil infrastructure. The platform is the same; the hierarchy, asset types and examples follow your operation. Use the industry switcher above to see each one.',
+  ],
+  [
     'How fast can we go live?',
     'A pilot typically runs in two to four weeks. We import your asset register, grade a representative sample and configure roles and workflows alongside your team, with hands-on onboarding throughout.',
   ],
   [
     'We already have a register and condition reports. Can we use them?',
-    'Yes. AssetStack imports Excel and CSV registers and your existing inspection data, then organises everything by location, room and asset. Nothing is re-collected unless it is missing.',
+    'Yes. AssetStack imports Excel and CSV registers, existing inspection data and work history, then organises everything into your own hierarchy: site, room, section, plant or structure. Nothing is re-collected unless it is missing.',
   ],
   [
     'Do we need sensors?',
-    'No. Condition assessment, the 20-year forward works program and capital planning all run from inspection data and photos. Where you do have sensors, readings can be ingested by MQTT, REST or CSV to drive live predictions.',
+    'No. Condition assessment, the 20-year program, compliance and capital planning all run from registers, inspection data and photos. Where you do have sensors or SCADA, readings are ingested by MQTT, REST or CSV and drive live predictions.',
   ],
   [
     'Does it work with our CMMS or finance system?',
@@ -134,7 +139,7 @@ const FAQS = [
   ],
   [
     'Is the reporting aligned to ISO 55000?',
-    'Yes. Reports are audit-ready and aligned to ISO 55000 and IPWEA reporting standards, so the same data supports your asset management plan, renewals forecast and council reporting.',
+    'Yes. Reports are audit-ready and aligned to ISO 55000 (and IPWEA for councils), so the same data supports your asset management plan, renewals forecast and regulatory reporting.',
   ],
   [
     'Where is our data stored?',
@@ -210,7 +215,7 @@ export function Faq() {
 // Same delivery as the site's ContactSection: JSON POST to FORM_ENDPOINT,
 // or a pre-filled mailto when no endpoint is configured (never fake success).
 
-const SIZES = ['Under 10 buildings', '10 – 50 buildings', '50 – 200 buildings', '200+ buildings'];
+const INDUSTRIES = [...LENS_ORDER.map((id) => LENSES[id].label), 'Other'];
 
 function Field({ label, children }) {
   return (
@@ -225,7 +230,9 @@ const inputCls =
   'w-full h-11 rounded-[12px] bg-white/[0.08] border border-white/15 px-3.5 text-[14px] text-white placeholder:text-white/35 outline-none focus:border-white/60 focus:bg-white/[0.12] transition-colors';
 
 export function Demo() {
-  const [form, setForm] = useState({ name: '', email: '', org: '', size: SIZES[1], message: '' });
+  const lens = useLens();
+  const [form, setForm] = useState({ name: '', email: '', org: '', industry: '', message: '' });
+  const industry = form.industry || lens.label; // follows the page's industry lens until chosen
   const [state, setState] = useState('idle'); // idle | sending | sent | error
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -236,15 +243,15 @@ export function Demo() {
       name: form.name,
       email: form.email,
       organisation: form.org,
-      portfolio: form.size,
+      industry,
       message: form.message,
-      source: 'Buildings & Facilities landing page',
+      source: 'Platform landing page',
     };
     if (!FORM_ENDPOINT) {
       const body = Object.entries(fields)
         .map(([k, v]) => `${k}: ${v}`)
         .join('\n');
-      window.location.href = `mailto:${CONTACT_EMAILS.join(',')}?subject=${encodeURIComponent('Demo request — Buildings & Facilities')}&body=${encodeURIComponent(body)}`;
+      window.location.href = `mailto:${CONTACT_EMAILS.join(',')}?subject=${encodeURIComponent(`Demo request — ${industry}`)}&body=${encodeURIComponent(body)}`;
       return;
     }
     setState('sending');
@@ -283,8 +290,8 @@ export function Demo() {
           </h2>
           <span className="block w-12 h-[2px] bg-white mt-10" />
           <p className="mt-6 text-[16px] leading-[1.6] text-white/85 max-w-[460px]">
-            Condition, maintenance, risk and capital for every building you own, one platform. Bring a register, a condition
-            report or a single building and we will show you its 20-year program in the first session.
+            Every source of asset data, one platform for predictive maintenance. Bring a register, a SCADA export or a single
+            critical asset and we will show you what it is telling you in the first session.
           </p>
           <div className="mt-8 space-y-2.5 text-[14px] text-white/85">
             <a href="mailto:hello@assetstackai.com" className="flex items-center gap-3 hover:text-white">
@@ -314,16 +321,16 @@ export function Demo() {
                     <input className={inputCls} value={form.name} onChange={set('name')} placeholder="Jane Doe" autoComplete="name" />
                   </Field>
                   <Field label="Work email">
-                    <input className={inputCls} type="email" required value={form.email} onChange={set('email')} placeholder="jane@council.gov.au" autoComplete="email" />
+                    <input className={inputCls} type="email" required value={form.email} onChange={set('email')} placeholder="jane@company.com.au" autoComplete="email" />
                   </Field>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <Field label="Organisation">
-                    <input className={inputCls} value={form.org} onChange={set('org')} placeholder="Council or organisation" autoComplete="organization" />
+                    <input className={inputCls} value={form.org} onChange={set('org')} placeholder="Company or council" autoComplete="organization" />
                   </Field>
-                  <Field label="Portfolio size">
-                    <select className={`${inputCls} appearance-none`} value={form.size} onChange={set('size')}>
-                      {SIZES.map((s) => (
+                  <Field label="Industry">
+                    <select className={`${inputCls} appearance-none`} value={industry} onChange={set('industry')}>
+                      {INDUSTRIES.map((s) => (
                         <option key={s} value={s} className="text-black">
                           {s}
                         </option>
@@ -337,7 +344,7 @@ export function Demo() {
                     className={`${inputCls} h-auto py-3 resize-none`}
                     value={form.message}
                     onChange={set('message')}
-                    placeholder="Condition reports, renewals backlog, a specific building…"
+                    placeholder="Asset count, data sources, the failures that cost you most…"
                   />
                 </Field>
                 <button

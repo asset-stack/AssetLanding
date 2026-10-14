@@ -1,44 +1,48 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Thermometer, Activity, Zap, Droplets } from 'lucide-react';
-import { BUILDINGS, COND, PORTFOLIO, CityMap, CondBadge, CondDot, Kpi, NoisyChart, Num, Screen, Sparkline, rng, fmtK, fmtM } from './kit';
+import { Thermometer, Activity, Zap, Gauge } from 'lucide-react';
+import { COND, CityMap, CondBadge, CondDot, Kpi, NoisyChart, Num, Screen, Sparkline, rng, fmtK, fmtM, useLens } from './kit';
 
 // ─── Dashboard ─────────────────────────────────────────────────────────────
 
 export function DashboardPanel() {
-  const [sel, setSel] = useState('AQU-03');
-  const b = BUILDINGS.find((x) => x.id === sel);
+  const L = useLens();
+  const P = L.portfolio;
+  const [sel, setSel] = useState(L.sites[0].id);
+  const b = L.sites.find((x) => x.id === sel) || L.sites[0];
+  const healthN = parseFloat(P.health);
+  const status = healthN >= 65 ? ['Good', 'var(--bx-ok)'] : healthN >= 55 ? ['Moderate', 'var(--bx-orange)'] : ['At risk', 'var(--bx-alert)'];
   return (
-    <Screen title="Dashboard" meta={`${PORTFOLIO.name} · ${PORTFOLIO.buildings} locations · ${PORTFOLIO.components} assets`}>
+    <Screen title="Portfolio view" meta={`${P.name} · ${P.sitesN} ${P.sitesLabel.toLowerCase()} · ${P.assets} assets`}>
       <div className="tile p-4 relative overflow-hidden">
-        <div className="absolute -right-10 -top-16 w-64 h-40 rounded-full blur-3xl" style={{ background: 'rgba(240,138,60,0.18)' }} />
+        <div className="absolute -right-10 -top-16 w-64 h-40 rounded-full blur-3xl" style={{ background: 'rgba(18,50,246,0.22)' }} />
         <div className="relative flex flex-wrap items-baseline justify-between gap-2">
           <div className="text-[11.5px] mute">AssetMind insight</div>
           <span className="chip">Updated 4 min ago</span>
         </div>
-        <div className="relative mt-2 text-[19px] font-light tracking-[-0.02em]">
-          Portfolio status: <span style={{ color: 'var(--bx-orange)' }}>Moderate</span>
-          <span className="mute"> · {PORTFOLIO.health} avg health</span>
+        <div className="relative mt-2 text-[19px] tracking-[-0.02em]">
+          Portfolio status: <span style={{ color: status[1] }}>{status[0]}</span>
+          <span className="mute"> · {P.health} avg health</span>
         </div>
         <div className="relative grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-[12px]">
           {[
-            ['Peak renewal year', PORTFOLIO.peakYear],
-            ['Avg remaining life', `${PORTFOLIO.remLife} yrs`],
-            ['Critical priority', PORTFOLIO.critical],
+            ['Peak renewal year', P.peakYear],
+            ['Avg remaining life', `${P.remLife} yrs`],
+            ['Critical priority', P.critical],
             ['Assessment coverage', '100%'],
           ].map(([k, v]) => (
             <div key={k}>
               <div className="dim text-[11px]">{k}</div>
-              <Num v={v} className="block mt-1 text-[20px] font-light tracking-[-0.02em]" />
+              <Num v={v} className="block mt-1 text-[20px]" />
             </div>
           ))}
         </div>
       </div>
       <div className="mt-2.5 grid lg:grid-cols-[1.6fr_1fr] gap-2.5">
-        <CityMap selected={sel} onSelect={setSel} compact className="aspect-[16/10] lg:aspect-auto lg:min-h-[320px]" />
+        <CityMap selected={b.id} onSelect={setSel} compact className="aspect-[16/10] lg:aspect-auto lg:min-h-[320px]" />
         <div className="flex flex-col gap-2.5">
           <div className="tile p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[11.5px] mute">{b.type}</span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11.5px] mute truncate">{b.type}</span>
               <CondBadge c={b.cond} />
             </div>
             <div className="mt-2 text-[17px] tracking-[-0.02em]">{b.name}</div>
@@ -55,11 +59,7 @@ export function DashboardPanel() {
           <div className="tile p-4 flex-1">
             <div className="text-[11.5px] mute mb-3">Alerts</div>
             <ul className="space-y-2.5 text-[12.5px]">
-              {[
-                [5, 'Aquatic Centre', 'Pool Circulation Pump 2 · 47 days RUL'],
-                [4, 'Community Hall', 'Roof membrane · ingress reported'],
-                [3, 'Works Depot', 'Switchboard thermal · +11 °C'],
-              ].map(([c, n, t]) => (
+              {L.alerts.map(([c, n, t]) => (
                 <li key={t} className="flex gap-2.5">
                   <span className="mt-1.5">
                     <CondDot c={c} pulse={c === 5} />
@@ -80,65 +80,58 @@ export function DashboardPanel() {
 
 // ─── Condition assessment overview ─────────────────────────────────────────
 
-const DIST = [
-  { c: 1, n: 612 },
-  { c: 2, n: 1384 },
-  { c: 3, n: 1290 },
-  { c: 4, n: 679 },
-  { c: 5, n: 143 },
-];
-const BY_LOCATION = [
-  ['Aquatic Centre', 412, 2.9, '$2.70M'],
-  ['Council Chambers & Administration', 1084, 2.6, '$1.92M'],
-  ['Library & Gallery', 506, 2.3, '$0.88M'],
-  ['Sports Complex', 638, 2.8, '$1.41M'],
-  ['Community Hall', 274, 3.3, '$0.61M'],
-];
-
 export function ConditionPanel() {
-  const total = DIST.reduce((a, d) => a + d.n, 0);
+  const L = useLens();
+  const C = L.condition;
+  const total = C.dist.reduce((a, n) => a + n, 0);
+  const peak = Math.max(...C.dist);
   return (
-    <Screen title="Condition assessment" meta="Building condition assessment · 7 locations combined">
+    <Screen title="Condition assessment" meta={C.meta}>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <Kpi label="Components" value={PORTFOLIO.components} />
-        <Kpi label="Avg condition grade" value={PORTFOLIO.avgCond} delta="1 Excellent – 5 Very poor" />
-        <Kpi label="Replacement cost" value="$7.52M" />
-        <Kpi label="20-yr program" value="$4.11M" delta="escalated" />
+        <Kpi label={C.unit[0].toUpperCase() + C.unit.slice(1)} value={total.toLocaleString()} />
+        <Kpi label="Avg condition grade" value={L.portfolio.avgCond} delta="1 Excellent – 5 Very poor" />
+        <Kpi label="Replacement cost" value={C.replacement} />
+        <Kpi label="20-yr program" value={C.program} delta="escalated" />
       </div>
       <div className="tile p-4 mt-2.5">
         <div className="flex items-center justify-between mb-3">
           <span className="text-[11.5px] mute">Condition distribution</span>
-          <span className="text-[11px] dim">{total.toLocaleString()} components</span>
+          <span className="text-[11px] dim">
+            {total.toLocaleString()} {C.unit}
+          </span>
         </div>
         <div className="space-y-2">
-          {DIST.map((d) => (
-            <div key={d.c} className="grid grid-cols-[110px_1fr_48px] items-center gap-3 text-[12px]">
-              <span className="flex items-center gap-2 mute">
-                <CondDot c={d.c} /> {d.c} · {COND[d.c].label}
-              </span>
-              <div className="h-[6px] rounded-full bg-white/[0.05] overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: `${(d.n / 1400) * 100}%`, background: COND[d.c].color }} />
+          {C.dist.map((n, i) => {
+            const c = i + 1;
+            return (
+              <div key={c} className="grid grid-cols-[110px_1fr_48px] items-center gap-3 text-[12px]">
+                <span className="flex items-center gap-2 mute">
+                  <CondDot c={c} /> {c} · {COND[c].label}
+                </span>
+                <div className="h-[6px] rounded-full bg-white/[0.05] overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(n / peak) * 100}%`, background: COND[c].color }} />
+                </div>
+                <span className="text-right tabular-nums">{n.toLocaleString()}</span>
               </div>
-              <span className="text-right tabular-nums">{d.n}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
       <div className="tile mt-2.5 overflow-x-auto">
         <table className="w-full text-[12.5px] min-w-[480px]">
           <thead>
             <tr className="text-left text-[11px] dim">
-              <th className="font-normal px-4 py-3 border-b hair">Location</th>
+              <th className="font-normal px-4 py-3 border-b hair">{L.portfolio.sitesLabel.replace(/s$/, '')}</th>
               <th className="font-normal px-4 py-3 border-b hair text-right">Assets</th>
               <th className="font-normal px-4 py-3 border-b hair text-right">Avg grade</th>
               <th className="font-normal px-4 py-3 border-b hair text-right">20-yr forecast</th>
             </tr>
           </thead>
           <tbody>
-            {BY_LOCATION.map(([n, a, g, f]) => (
+            {C.byLoc.map(([n, a, g, f]) => (
               <tr key={n}>
                 <td className="px-4 py-2.5 border-b hair">{n}</td>
-                <td className="px-4 py-2.5 border-b hair text-right mute tabular-nums">{a}</td>
+                <td className="px-4 py-2.5 border-b hair text-right mute tabular-nums">{a.toLocaleString()}</td>
                 <td className="px-4 py-2.5 border-b hair text-right tabular-nums" style={{ color: g >= 3 ? 'var(--bx-orange)' : undefined }}>
                   {g.toFixed(1)}
                 </td>
@@ -152,60 +145,42 @@ export function ConditionPanel() {
   );
 }
 
-// ─── 20-year Forward Works Program ─────────────────────────────────────────
-// Mirrors the platform's "Program by Room" + "Sum of annual cost by group"
-// views for one building (Aquatic Centre, $2,703,471 over 20 years).
+// ─── 20-year forward works program ─────────────────────────────────────────
 
-const ROOMS = [
-  ['R01', '25m Pool Hall', 1593509],
-  ['R02', 'Leisure Pool Area', 300417],
-  ['R08', 'External & Carpark', 340357],
-  ['R03', 'Plant Room', 165225],
-  ['R04', 'Male Change Rooms', 87889],
-  ['R05', 'Female Change Rooms', 73641],
-  ['R06', 'Reception & Foyer', 71764],
-  ['R07', 'Kiosk & Seating', 49095],
-  ['R09', 'Amenities & Store', 11612],
-  ['R10', 'First Aid & Office', 9962],
-];
-const FWP_TOTAL = ROOMS.reduce((a, r) => a + r[2], 0);
-const GROUPS = [
-  { k: 'Roof', col: '#ececec' },
-  { k: 'Mechanical', col: '#f08a3c' },
-  { k: 'Electrical', col: '#9a9a9a' },
-  { k: 'Finishes', col: '#5e5e5e' },
-  { k: 'Hydraulic', col: '#3a3a3a' },
-];
+const GROUP_COLS = ['#ececec', '#f08a3c', '#9a9a9a', '#5e5e5e', '#3a3a3a'];
 const PROGRAMS = { 'Must do': 0.62, Balanced: 1, Premium: 1.32 };
 
-function buildFwp() {
-  const r = rng(42);
+function buildFwp(seed) {
+  const r = rng(seed);
   // lumpy renewal profile: a few big years, a long quiet tail
   const spikes = { 1: 1.6, 6: 2.6, 13: 1.8, 18: 3.4 };
   return Array.from({ length: 20 }, (_, i) => {
     const base = 0.25 + r() * 0.5 + (spikes[i] || 0);
-    const parts = GROUPS.map((_, k) => base * (0.4 + r() * (k === 1 ? 1.2 : 0.8)));
+    const parts = GROUP_COLS.map((_, k) => base * (0.4 + r() * (k === 1 ? 1.2 : 0.8)));
     return { year: 2027 + i, parts };
   });
 }
 
 export function FwpPanel() {
-  const raw = useMemo(buildFwp, []);
+  const L = useLens();
+  const F = L.fwp;
+  const total = F.rows.reduce((a, r) => a + r[2], 0);
+  const raw = useMemo(() => buildFwp(L.id.length * 7 + 35), [L.id]);
   const [prog, setProg] = useState('Balanced');
   const [hover, setHover] = useState(18);
   const scale = PROGRAMS[prog];
   const rawSum = raw.reduce((a, d) => a + d.parts.reduce((x, y) => x + y, 0), 0);
-  const k = (FWP_TOTAL * scale) / rawSum;
+  const k = (total * scale) / rawSum;
   const data = raw.map((d) => ({ ...d, parts: d.parts.map((p) => p * k), total: d.parts.reduce((x, y) => x + y, 0) * k }));
-  const max = Math.max(...raw.map((d) => d.parts.reduce((x, y) => x + y, 0))) * (FWP_TOTAL * PROGRAMS.Premium) / rawSum;
+  const max = (Math.max(...raw.map((d) => d.parts.reduce((x, y) => x + y, 0))) * (total * PROGRAMS.Premium)) / rawSum;
   const h = data[hover];
-  const roomMax = ROOMS[0][2];
+  const rowMax = Math.max(...F.rows.map((r) => r[2]));
   return (
-    <Screen title="20-year forward works program" meta="Aquatic Centre · 10 rooms · escalated at 3% p.a.">
+    <Screen title="20-year forward works program" meta={F.meta}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-[11.5px] mute">20-yr program · {prog}</div>
-          <Num v={fmtM(FWP_TOTAL * scale)} className="block text-[34px] font-light tracking-[-0.03em] leading-none mt-1.5" />
+          <Num v={fmtM(total * scale)} className="block text-[34px] leading-none mt-1.5" />
         </div>
         <div className="flex gap-1 p-1 rounded-full bg-white/[0.04] border hair">
           {Object.keys(PROGRAMS).map((p) => (
@@ -246,7 +221,7 @@ export function FwpPanel() {
                     className="relative block w-full transition-all duration-500"
                     style={{
                       height: `${(p / max) * 100}%`,
-                      background: GROUPS[j].col,
+                      background: GROUP_COLS[j],
                       opacity: hover === i ? 1 : 0.55,
                       borderRadius: j === d.parts.length - 1 ? '2px 2px 0 0' : 0,
                       marginTop: 1,
@@ -264,28 +239,28 @@ export function FwpPanel() {
             <span>2046</span>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
-            {GROUPS.map((c) => (
-              <span key={c.k} className="inline-flex items-center gap-1.5 text-[11.5px] mute">
-                <span className="w-2 h-2 rounded-[2px]" style={{ background: c.col }} />
-                {c.k}
+            {F.groups.map((g, j) => (
+              <span key={g} className="inline-flex items-center gap-1.5 text-[11.5px] mute">
+                <span className="w-2 h-2 rounded-[2px]" style={{ background: GROUP_COLS[j] }} />
+                {g}
               </span>
             ))}
           </div>
         </div>
         <div className="tile p-4">
-          <div className="text-[11.5px] mute mb-3">Program by room</div>
+          <div className="text-[11.5px] mute mb-3">{F.unitLabel}</div>
           <ul className="space-y-2">
-            {ROOMS.slice(0, 7).map(([id, n, v]) => (
+            {F.rows.slice(0, 7).map(([id, n, v], i) => (
               <li key={id} className="text-[12px]">
                 <div className="flex justify-between gap-2">
                   <span className="truncate">
-                    <span className="dim mr-1.5">{id}</span>
+                    <span className="dim mr-1.5 mono text-[10.5px]">{id}</span>
                     {n}
                   </span>
                   <span className="tabular-nums">{fmtK(v * scale)}</span>
                 </div>
                 <div className="h-[2px] mt-1.5 bg-white/[0.05] rounded-full">
-                  <div className="h-full rounded-full" style={{ width: `${(v / roomMax) * 100}%`, background: id === 'R01' ? 'var(--bx-orange)' : 'rgba(236,236,236,.6)' }} />
+                  <div className="h-full rounded-full" style={{ width: `${(v / rowMax) * 100}%`, background: i === 0 ? 'var(--bx-orange)' : 'rgba(236,236,236,.6)' }} />
                 </div>
               </li>
             ))}
@@ -296,54 +271,44 @@ export function FwpPanel() {
   );
 }
 
-// ─── Asset tree ────────────────────────────────────────────────────────────
-// The platform's register graph: All locations → location → room → asset.
+// ─── Asset register graph ──────────────────────────────────────────────────
 
-const LOCS = [
-  { n: 'Aquatic Centre', a: 412, crit: 31, rooms: ['25m Pool Hall', 'Leisure Pool', 'Plant Room', 'Change Rooms', 'Reception'] },
-  { n: 'Council Chambers', a: 1084, crit: 24, rooms: ['Chamber', 'Offices L1', 'Offices L2', 'Lifts', 'Plant'] },
-  { n: 'Library & Gallery', a: 506, crit: 9, rooms: ['Reading Room', 'Gallery', 'Archive', 'Amenities', 'Roof'] },
-  { n: 'Sports Complex', a: 638, crit: 18, rooms: ['Courts', 'Gym', 'Change Rooms', 'Kiosk', 'Plant'] },
-  { n: 'Community Hall', a: 274, crit: 14, rooms: ['Main Hall', 'Kitchen', 'Stage', 'Amenities', 'Roof'] },
-  { n: 'Works Depot', a: 690, crit: 21, rooms: ['Workshop', 'Wash Bay', 'Stores', 'Offices', 'Yard'] },
-  { n: 'Airport Terminal', a: 504, crit: 26, rooms: ['Departures', 'Arrivals', 'Baggage', 'Kiosk', 'Plant'] },
-];
-const ROOM_ASSETS = [
-  ['Floor / wall tiles (inc. splashback)', 1, 'Bathroom'],
-  ['Circulation pump P-02', 5, 'Mechanical'],
-  ['Ceiling panels', 3, 'Ceiling'],
-  ['LED high-bay lighting', 2, 'Electrical'],
-];
+function shortNames(names) {
+  const first = names.map((n) => n.split(' ')[0]);
+  return names.map((n, i) => {
+    const w = n.split(' ');
+    const clash = first.filter((f) => f === first[i]).length > 1;
+    return clash ? w[w.length - 1] : w[0];
+  });
+}
 
 export function AssetTreePanel() {
+  const L = useLens();
+  const P = L.portfolio;
+  const LOCS = L.tree.locs;
   const [li, setLi] = useState(0);
-  const [ri, setRi] = useState(2);
+  const [ri, setRi] = useState(0);
   const W = 640;
   const loc = LOCS[li];
+  const names = shortNames(LOCS.map((l) => l.n));
   const lx = (i) => 40 + (i * (W - 80)) / (LOCS.length - 1);
-  const rx = (i) => 110 + (i * (W - 220)) / (loc.rooms.length - 1);
+  const rx = (i) => 110 + (i * (W - 220)) / (loc.subs.length - 1);
+  const font = 'Inter Tight, sans-serif';
   return (
-    <Screen title="Asset register" meta="Every asset organised by Location → Room → Asset — one defensible register">
+    <Screen title="Asset register" meta={`Every asset organised by ${P.hierarchy} — one defensible register`}>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <Kpi label="Total assets" value={PORTFOLIO.components} />
-        <Kpi label="Locations" value={PORTFOLIO.buildings} />
-        <Kpi label="Rooms" value={PORTFOLIO.rooms} />
-        <Kpi label="Critical" value={PORTFOLIO.critical} tone="var(--bx-alert)" delta="● flagged" />
+        <Kpi label="Total assets" value={P.assets} />
+        <Kpi label={P.sitesLabel} value={P.sitesN} />
+        <Kpi label={P.subLabel} value={P.subN} />
+        <Kpi label="Critical" value={P.critical} tone="var(--bx-alert)" delta="● flagged" />
       </div>
       <div className="grid gap-2.5 mt-2.5">
         <div className="tile p-2 overflow-x-auto">
           <svg viewBox={`0 0 ${W} 330`} className="w-full min-w-[540px]">
-            {/* root */}
             {LOCS.map((l, i) => (
-              <path
-                key={l.n}
-                d={`M${W / 2},52 C${W / 2},100 ${lx(i)},90 ${lx(i)},138`}
-                fill="none"
-                stroke="#fff"
-                strokeOpacity={i === li ? 0.55 : 0.12}
-              />
+              <path key={l.n} d={`M${W / 2},52 C${W / 2},100 ${lx(i)},90 ${lx(i)},138`} fill="none" stroke="#fff" strokeOpacity={i === li ? 0.55 : 0.12} />
             ))}
-            {loc.rooms.map((r, i) => (
+            {loc.subs.map((r, i) => (
               <path
                 key={r}
                 d={`M${lx(li)},158 C${lx(li)},210 ${rx(i)},200 ${rx(i)},248`}
@@ -356,25 +321,33 @@ export function AssetTreePanel() {
             <g transform={`translate(${W / 2} 38)`}>
               <circle r="16" fill="#1b1b1b" stroke="#fff" strokeOpacity="0.6" />
               <circle r="4" fill="#ececec" />
-              <text y="34" textAnchor="middle" fill="#ececec" fontSize="11" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
-                All locations
+              <text y="34" textAnchor="middle" fill="#ececec" fontSize="11" fontFamily={font}>
+                {P.name}
               </text>
             </g>
             {LOCS.map((l, i) => (
-              <g key={l.n} transform={`translate(${lx(i)} 148)`} onClick={() => { setLi(i); setRi(0); }} style={{ cursor: 'pointer' }}>
+              <g
+                key={l.n}
+                transform={`translate(${lx(i)} 148)`}
+                onClick={() => {
+                  setLi(i);
+                  setRi(0);
+                }}
+                style={{ cursor: 'pointer' }}
+              >
                 <circle r="20" fill="transparent" />
                 <circle r="11" fill={i === li ? '#ececec' : '#1b1b1b'} stroke="#fff" strokeOpacity={i === li ? 1 : 0.35} />
                 {l.crit > 20 && <circle cx="8" cy="-8" r="3.5" fill="#ff4545" />}
-                <text y="28" textAnchor="middle" fill="#ececec" fillOpacity={i === li ? 1 : 0.5} fontSize="10" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
-                  {l.n.split(' ')[0]}
+                <text y="28" textAnchor="middle" fill="#ececec" fillOpacity={i === li ? 1 : 0.5} fontSize="10" fontFamily={font}>
+                  {names[i]}
                 </text>
               </g>
             ))}
-            {loc.rooms.map((r, i) => (
+            {loc.subs.map((r, i) => (
               <g key={r} transform={`translate(${rx(i)} 258)`} onClick={() => setRi(i)} style={{ cursor: 'pointer' }}>
                 <circle r="18" fill="transparent" />
                 <rect x="-8" y="-8" width="16" height="16" rx="5" fill={i === ri ? '#1232f6' : '#1b1b1b'} stroke="#fff" strokeOpacity={i === ri ? 0 : 0.3} />
-                <text y="26" textAnchor="middle" fill="#ececec" fillOpacity={i === ri ? 1 : 0.5} fontSize="10" fontFamily="Helvetica Neue, Inter Tight, sans-serif">
+                <text y="26" textAnchor="middle" fill="#ececec" fillOpacity={i === ri ? 1 : 0.5} fontSize="10" fontFamily={font}>
                   {r}
                 </text>
               </g>
@@ -395,21 +368,21 @@ export function AssetTreePanel() {
         </div>
         <div className="tile p-4 grid sm:grid-cols-[1.4fr_1fr] gap-5">
           <div>
-          <div className="text-[11.5px] mute">
-            {loc.n} · {loc.rooms[ri]}
-          </div>
-          <div className="mt-1 text-[12px] dim">
-            {loc.a} assets · {loc.crit} critical
-          </div>
-          <ul className="mt-4 space-y-1.5">
-            {ROOM_ASSETS.map(([n, c, g]) => (
-              <li key={n} className="flex items-center gap-2.5 rounded-[10px] bg-white/[0.03] px-3 py-2 text-[12px]">
-                <CondDot c={c} pulse={c === 5} />
-                <span className="flex-1 min-w-0 truncate">{n}</span>
-                <span className="dim text-[11px]">{g}</span>
-              </li>
-            ))}
-          </ul>
+            <div className="text-[11.5px] mute">
+              {loc.n} · {loc.subs[ri]}
+            </div>
+            <div className="mt-1 text-[12px] dim">
+              {loc.a.toLocaleString()} assets · {loc.crit} critical
+            </div>
+            <ul className="mt-4 space-y-1.5">
+              {L.tree.assets.map(([n, c, g]) => (
+                <li key={n} className="flex items-center gap-2.5 rounded-[10px] bg-white/[0.03] px-3 py-2 text-[12px]">
+                  <CondDot c={c} pulse={c === 5} />
+                  <span className="flex-1 min-w-0 truncate">{n}</span>
+                  <span className="dim text-[11px]">{g}</span>
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="self-end">
             <div className="text-[11px] dim mb-2">Condition · last 90 days</div>
@@ -422,23 +395,6 @@ export function AssetTreePanel() {
 }
 
 // ─── Digital twin ──────────────────────────────────────────────────────────
-
-const LEVELS = ['Roof', 'Level 1', 'Ground'];
-const HOTSPOTS = {
-  Roof: [
-    { x: 0.32, y: 0.4, c: 4, t: 'Membrane — Zone B', d: 'Ponding + split seam · photo 14 d ago' },
-    { x: 0.66, y: 0.58, c: 3, t: 'Rooftop AHU-03', d: 'Coil corrosion · C3' },
-  ],
-  'Level 1': [
-    { x: 0.44, y: 0.5, c: 4, t: 'Ceiling — Room 1.12', d: 'Water staining below Zone B' },
-    { x: 0.72, y: 0.36, c: 2, t: 'Lighting circuit DB-1A', d: 'Normal · sensor live' },
-  ],
-  Ground: [
-    { x: 0.28, y: 0.62, c: 5, t: 'Chiller CH-01', d: 'Vibration 4.2 mm/s · 4σ anomaly' },
-    { x: 0.6, y: 0.44, c: 3, t: 'Main switchboard', d: 'Thermal +11 °C at phase B' },
-    { x: 0.8, y: 0.66, c: 2, t: 'Pool filtration P-02', d: 'Pressure nominal' },
-  ],
-};
 
 function IsoSlab({ y, active }) {
   // isometric rectangle centred at (200, y)
@@ -462,47 +418,48 @@ function IsoSlab({ y, active }) {
   );
 }
 
+const SLAB_Y = [90, 170, 250];
+
 export function TwinPanel() {
-  const [lvl, setLvl] = useState('Ground');
+  const L = useLens();
+  const T = L.twin;
+  // open on the level holding the worst hotspot
+  const worst = T.spots.map((s) => Math.max(...s.map((x) => x.c)));
+  const [lvl, setLvl] = useState(worst.indexOf(Math.max(...worst)));
   const [hs, setHs] = useState(0);
-  const ys = { Roof: 90, 'Level 1': 170, Ground: 250 };
-  const spots = HOTSPOTS[lvl];
+  const spots = T.spots[lvl];
   const spot = spots[Math.min(hs, spots.length - 1)];
   return (
-    <Screen title="Digital twins" meta="Aquatic Centre · Matterport 3D tour · 12 of 12 locations captured">
+    <Screen title="Digital twin" meta={T.meta}>
       <div className="grid lg:grid-cols-[1.5fr_1fr] gap-2.5">
         <div className="tile relative overflow-hidden aspect-[4/3] lg:aspect-auto lg:min-h-[340px]">
           <div className="absolute top-3 left-3 flex gap-1 rounded-full p-1 z-10 bg-black/50 border hair backdrop-blur-md">
-            {LEVELS.map((l) => (
+            {T.levels.map((l, i) => (
               <button
                 key={l}
                 type="button"
                 onClick={() => {
-                  setLvl(l);
+                  setLvl(i);
                   setHs(0);
                 }}
-                className={`px-3 py-1 rounded-full text-[11.5px] transition-colors ${
-                  lvl === l ? 'bg-[var(--bx-blue)] text-white' : 'mute hover:text-white'
-                }`}
+                className={`px-3 py-1 rounded-full text-[11.5px] transition-colors ${lvl === i ? 'bg-[var(--bx-blue)] text-white' : 'mute hover:text-white'}`}
               >
                 {l}
               </button>
             ))}
           </div>
           <svg viewBox="0 0 400 340" className="absolute inset-0 w-full h-full">
-            {/* vertical edges */}
             <g stroke="#fff" strokeOpacity="0.12" strokeDasharray="2 4">
               <line x1="50" y1="90" x2="50" y2="250" />
               <line x1="350" y1="90" x2="350" y2="250" />
               <line x1="200" y1="172" x2="200" y2="332" />
             </g>
-            {['Ground', 'Level 1', 'Roof'].map((l) => (
-              <IsoSlab key={l} y={ys[l]} active={l === lvl} />
+            {[2, 1, 0].map((i) => (
+              <IsoSlab key={i} y={SLAB_Y[i]} active={i === lvl} />
             ))}
             {spots.map((s, i) => {
-              // map unit square → iso diamond of the active level
               const cx = 200 + (s.x - s.y) * 150;
-              const cy = ys[lvl] - 82 + (s.x + s.y) * 82;
+              const cy = SLAB_Y[lvl] - 82 + (s.x + s.y) * 82;
               const col = COND[s.c].color;
               return (
                 <g key={s.t} transform={`translate(${cx} ${cy})`} onMouseEnter={() => setHs(i)} onClick={() => setHs(i)} style={{ cursor: 'pointer' }}>
@@ -523,24 +480,22 @@ export function TwinPanel() {
         </div>
         <div className="flex flex-col gap-2.5">
           <div className="tile p-4">
-            <div className="flex items-center justify-between">
-              <span className="eyebrow !text-[10px]">Hotspot · {lvl}</span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] dim">Hotspot · {T.levels[lvl]}</span>
               <CondBadge c={spot.c} />
             </div>
             <div className="mt-2 text-[16px] tracking-[-0.02em]">{spot.t}</div>
             <div className="mt-1 text-[12.5px] mute">{spot.d}</div>
           </div>
           <div className="tile p-4 flex-1">
-            <div className="eyebrow !text-[10px] mb-2">On this level</div>
+            <div className="text-[11px] dim mb-2">On this level</div>
             <ul className="space-y-1">
               {spots.map((s, i) => (
                 <li key={s.t}>
                   <button
                     type="button"
                     onClick={() => setHs(i)}
-                    className={`w-full flex items-center gap-2.5 px-2 py-1.5 rounded-[8px] text-[12.5px] text-left ${
-                      hs === i ? 'bg-white/[0.07]' : 'hover:bg-white/[0.035]'
-                    }`}
+                    className={`w-full flex items-center gap-2.5 px-2 py-1.5 rounded-[8px] text-[12.5px] text-left ${hs === i ? 'bg-white/[0.07]' : 'hover:bg-white/[0.035]'}`}
                   >
                     <CondDot c={s.c} /> {s.t}
                   </button>
@@ -556,24 +511,15 @@ export function TwinPanel() {
 
 // ─── Equipment register ────────────────────────────────────────────────────
 
-const EQUIP = [
-  ['CH-01', 'Chiller — centrifugal', 'Aquatic Centre', 'Mechanical', 2009, 5, '$184,000'],
-  ['L1', 'Passenger lift', 'Council Chambers', 'Vertical transport', 2004, 3, '$212,000'],
-  ['MSB', 'Main switchboard', 'Works Depot', 'Electrical', 1998, 3, '$96,000'],
-  ['AHU-03', 'Air handling unit', 'Library & Gallery', 'Mechanical', 2015, 2, '$64,500'],
-  ['FIP-01', 'Fire indicator panel', 'Childcare Centre', 'Fire services', 2019, 1, '$18,200'],
-  ['HWS-02', 'Hot water plant', 'Sports Complex', 'Hydraulics', 2011, 3, '$41,000'],
-  ['RF-B', 'Roof membrane Zone B', 'Community Hall', 'Envelope', 1996, 4, '$128,000'],
-];
-const DISC = ['All', 'Mechanical', 'Electrical', 'Hydraulics', 'Envelope'];
-
 export function EquipmentPanel() {
+  const L = useLens();
+  const E = L.equip;
   const [f, setF] = useState('All');
-  const rows = EQUIP.filter((r) => f === 'All' || r[3] === f);
+  const rows = E.rows.filter((r) => f === 'All' || r[3] === f);
   return (
-    <Screen title="Equipment register" meta="6,212 items · export CSV / XLSX">
+    <Screen title="Equipment register" meta={E.meta}>
       <div className="flex gap-1.5 mb-3 scroll-x">
-        {DISC.map((d) => (
+        {E.disc.map((d) => (
           <button
             key={d}
             type="button"
@@ -588,8 +534,8 @@ export function EquipmentPanel() {
         <table className="w-full text-[12.5px] min-w-[560px]">
           <thead>
             <tr className="text-left">
-              {['ID', 'Equipment', 'Location', 'Installed', 'Cond.', 'Replacement'].map((h) => (
-                <th key={h} className="eyebrow !text-[9.5px] font-normal px-3.5 py-3 border-b hair">
+              {['ID', 'Asset', 'Location', 'Installed', 'Cond.', 'Replacement'].map((h) => (
+                <th key={h} className="text-[11px] dim font-normal px-3.5 py-3 border-b hair">
                   {h}
                 </th>
               ))}
@@ -617,12 +563,7 @@ export function EquipmentPanel() {
 
 // ─── Sensors ───────────────────────────────────────────────────────────────
 
-const SIGNALS = [
-  { k: 'Vibration', unit: 'mm/s', icon: Activity, base: 3.6, amp: 0.6, warn: 4.0, src: 'Chiller CH-01' },
-  { k: 'Supply air', unit: '°C', icon: Thermometer, base: 14.2, amp: 0.5, warn: 16, src: 'AHU-03' },
-  { k: 'Current draw', unit: 'A', icon: Zap, base: 21.4, amp: 1.2, warn: 26, src: 'Pump P-02' },
-  { k: 'Line pressure', unit: 'kPa', icon: Droplets, base: 310, amp: 9, warn: 340, src: 'Hydraulic riser' },
-];
+const ICONS = { vib: Activity, temp: Thermometer, amp: Zap, press: Gauge };
 
 function useLive() {
   const [t, setT] = useState(0);
@@ -634,41 +575,43 @@ function useLive() {
 }
 
 export function SensorsPanel() {
+  const L = useLens();
   const t = useLive();
-  const series = SIGNALS.map((s, k) =>
+  const series = L.signals.map((s, k) =>
     Array.from({ length: 36 }, (_, i) => {
       const x = i + t;
-      return s.base + Math.sin(x / 3 + k) * s.amp * 0.6 + Math.sin(x / 1.3 + k * 2) * s.amp * 0.3 + (k === 0 && i > 30 ? (i - 30) * 0.12 : 0);
+      // the first signal drifts towards its limit at the end of the window
+      const drift = k === 0 && i > 30 ? (i - 30) * s.amp * 0.2 * (s.warnBelow ? -1 : 1) : 0;
+      return s.base + Math.sin(x / 3 + k) * s.amp * 0.6 + Math.sin(x / 1.3 + k * 2) * s.amp * 0.3 + drift;
     }),
   );
   return (
-    <Screen title="Sensors" meta="MQTT · REST · CSV — 312 streams">
+    <Screen title="Sensors" meta="MQTT · REST · CSV — live streams">
       <div className="grid sm:grid-cols-2 gap-2.5">
-        {SIGNALS.map((s, k) => {
+        {L.signals.map((s, k) => {
           const v = series[k][series[k].length - 1];
-          const hot = v > s.warn;
-          const Icon = s.icon;
+          const hot = s.warnBelow ? v < s.warn : v > s.warn;
+          const Icon = ICONS[s.icon] || Activity;
+          const dp = Math.abs(s.base) >= 100 ? 0 : 1;
           return (
             <div key={s.k} className="tile p-4">
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-2 text-[12.5px]">
-                  <Icon className="w-3.5 h-3.5 mute" strokeWidth={1.5} /> {s.k}
+              <div className="flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-2 text-[12.5px] min-w-0">
+                  <Icon className="w-3.5 h-3.5 mute flex-none" strokeWidth={1.5} /> <span className="truncate">{s.k}</span>
                 </span>
-                <span className="inline-flex items-center gap-1.5 mono text-[10px] mute">
-                  <span className="dot pulse" style={{ background: hot ? 'var(--bx-c5)' : 'var(--bx-signal)', color: hot ? 'var(--bx-c5)' : 'var(--bx-signal)' }} />
+                <span className="inline-flex items-center gap-1.5 text-[10.5px] mute flex-none">
+                  <span className="dot pulse" style={{ background: hot ? 'var(--bx-c5)' : 'var(--bx-ok)', color: hot ? 'var(--bx-c5)' : 'var(--bx-ok)' }} />
                   {hot ? 'threshold' : 'live'}
                 </span>
               </div>
               <div className="mt-2 flex items-baseline gap-1.5">
-                <span className="fig text-[28px] leading-none">
-                  {v.toFixed(s.base > 100 ? 0 : 1)}
-                </span>
+                <span className="fig text-[28px] leading-none">{v.toFixed(dp)}</span>
                 <span className="mono text-[11px] dim">{s.unit}</span>
               </div>
               <div className="mt-3">
                 <Sparkline data={series[k]} h={40} stroke={hot ? '#ff4545' : '#ededef'} />
               </div>
-              <div className="mono text-[10px] dim mt-2">{s.src}</div>
+              <div className="text-[11px] dim mt-2">{s.src}</div>
             </div>
           );
         })}
